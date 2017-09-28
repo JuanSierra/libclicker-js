@@ -1,0 +1,180 @@
+/**
+     * Constructs a new item
+     *
+     * @param world World this item belongs to
+     * @param name  Name of this item
+     */
+function Item(world, name = "Nameless Item"){
+    /**
+     * World this item belongs to
+     */
+    this.world = world;
+
+    /**
+     * Modifiers applied to this item
+     */
+    this.modifiers = [];
+
+    /**
+     * The base price of the item (i.e. the price of the first level of this item)
+     */
+    this.basePrice = 1;//BigInteger.ONE;
+
+    /**
+     * Name of this item
+     */
+    this.name = name;
+
+    /**
+     * Description text for this item
+     */
+    this.description = "No description.";
+
+    /**
+     * Current level of this item
+     */
+    this.itemLevel = 0;
+
+    /**
+     * Max. item level
+     */
+    this.maxItemLevel = 99999999;//Long.MAX_VALUE;
+
+    /**
+     * Price multiplier per level. This is used in the price formula
+     * like this: price = (base price) * (price multiplier) ^ (item level)
+     */
+    this.priceMultiplier = 1.145;
+
+
+
+    /**
+     * Retrieves the name of this item
+     *
+     * @return Name of this item
+     */
+    this.getName = function() {
+        return name;
+    }
+
+    /**
+     * Sets the name of this item
+     *
+     * @param name New name for this item
+     */
+    this.setName = function(name) {
+        //if (name == null || name.length() == 0)
+            //throw new RuntimeException("Item name cannot be null or empty");
+        this.name = name;
+    }
+
+    this.getDescription = function() {
+        return this.description;
+    }
+
+    this.setDescription = function(description) {
+        this.description = description;
+    }
+
+    /**
+     * Retrieves the base price of this item
+     *
+     * @return Base price of this item
+     */
+    this.getBasePrice = function() {
+        return basePrice;
+    }
+
+    this.setBasePrice = function(basePrice) {
+        this.basePrice = basePrice;
+    }
+
+    this.getPrice = function() {
+        var tmp = basePrice;
+        tmp = tmp * Math.pow(this.priceMultiplier, this.itemLevel);
+        return tmp;
+    }
+
+    this.buyWith = function(currency) {
+        //if (currency == null) throw new IllegalArgumentException("Currency cannot be null");
+        if (this.itemLevel >= this.maxItemLevel)
+            return 'MAX_LEVEL_REACHED';//PurchaseResult.MAX_LEVEL_REACHED;
+
+        var price = this.getPrice();
+        var result = this.currency.getValue()- price;
+		
+        if (result < 0) {
+            return "INSUFFICIENT_FUNDS";
+        }
+        currency -= price;//currency.sub(price);
+        this.upgrade();
+        return 'OK'//PurchaseResult.OK;
+    }
+
+    /**
+     * Sets the base price of this item
+     *
+     * @param basePrice New base price for this item
+     */
+    this.setBasePrice = function(basePrice) {
+        //if (basePrice == null) throw new RuntimeException("Base price cannot be null");
+        //if (basePrice == 0)
+          //  throw new RuntimeException("Base price cannot be zero");
+        this.basePrice = basePrice;
+    }
+
+    this.setBasePrice = function(basePrice) {
+        this.basePrice = basePrice;//new BigInteger("" + basePrice);
+    }
+
+    /**
+     * Retrieves the price multiplier
+     *
+     * @return Price multiplier
+     */
+    this.getPriceMultiplier = function() {
+        return priceMultiplier;
+    }
+
+    /**
+     * Sets the price multiplier of this item
+     *
+     * @param multiplier Price multiplier
+     */
+    this.setPriceMultiplier = function(multiplier) {
+        this.priceMultiplier = multiplier;
+    }
+
+    this.getMaxItemLevel = function() {
+        return this.maxItemLevel;
+    }
+
+    this.setMaxItemLevel = function(maxLvl) {
+        if (maxLvl <= 0) throw new RuntimeException("Max item level cannot be zero or negative");
+        maxItemLevel = maxLvl;
+    }
+
+    this.getItemLevel = function() {
+        return itemLevel;
+    }
+
+    this.setItemLevel = function(lvl) {
+        this.itemLevel = lvl < 0 ? 0 : lvl > this.maxItemLevel ? this.maxItemLevel : lvl;
+    }
+
+    this.upgrade = function() {
+        if (this.itemLevel < this.maxItemLevel) {
+            this.itemLevel++;
+        }
+    }
+
+    this.downgrade = function() {
+        if (this.itemLevel > 0) {
+            this.itemLevel--;
+        }
+    }
+
+    this.maximize = function() {
+        this.itemLevel = this.maxItemLevel;
+    }
+}
