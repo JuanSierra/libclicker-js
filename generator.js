@@ -9,7 +9,7 @@
 */
 
 function generator(){
-	
+	Item.call(this);
 	this.itemLevel;
 	this.maxItemLevel;
 	this.modifiers;
@@ -348,3 +348,6 @@ function generator(){
         }
     }
 }
+
+generator.prototype = Object.create(Item.prototype);
+generator.prototype.constructor = generator;

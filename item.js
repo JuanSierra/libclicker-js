@@ -82,7 +82,7 @@ function Item(world, name = "Nameless Item"){
      * @return Base price of this item
      */
     this.getBasePrice = function() {
-        return basePrice;
+        return this.basePrice;
     }
 
     this.setBasePrice = function(basePrice) {
@@ -90,7 +90,7 @@ function Item(world, name = "Nameless Item"){
     }
 
     this.getPrice = function() {
-        var tmp = basePrice;
+        var tmp = this.basePrice;
         tmp = tmp * Math.pow(this.priceMultiplier, this.itemLevel);
         return tmp;
     }
@@ -101,7 +101,7 @@ function Item(world, name = "Nameless Item"){
             return 'MAX_LEVEL_REACHED';//PurchaseResult.MAX_LEVEL_REACHED;
 
         var price = this.getPrice();
-        var result = this.currency.getValue()- price;
+        var result = currency.value - price;
 		
         if (result < 0) {
             return "INSUFFICIENT_FUNDS";
@@ -151,11 +151,11 @@ function Item(world, name = "Nameless Item"){
 
     this.setMaxItemLevel = function(maxLvl) {
         if (maxLvl <= 0) throw new RuntimeException("Max item level cannot be zero or negative");
-        maxItemLevel = maxLvl;
+        this.maxItemLevel = maxLvl;
     }
 
     this.getItemLevel = function() {
-        return itemLevel;
+        return this.itemLevel;
     }
 
     this.setItemLevel = function(lvl) {
