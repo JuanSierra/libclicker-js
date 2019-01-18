@@ -31,16 +31,17 @@
  *
  * @author Harri Pellikka
  */
- function Modifier(world)
+ class Modifier extends Item
  {
-    Item.call(this, world);
-    this.mEnabled = false;
+    constructor(world){
+        this.world = world;
+        this.mEnabled = false;
+    }
  
     /**
      * Enables this modifier, i.e. makes it active
      */
-    this.enable = function()
-    {
+    enable() {
         if(!this.mEnabled)
         {
             this.mEnabled = true;
@@ -52,8 +53,7 @@
     /**
      * Disables this modifier, i.e. makes it inactive
      */
-    this.disable = function()
-    {
+    disable() {
         if(this.mEnabled)
         { 
             this.onDisable();
@@ -66,101 +66,102 @@
      * Checks whether or not this modifier is enabled
      * @return True if enabled, false otherwise
      */
-    this.isEnabled = function()
-    {
+    isEnabled (){
         return this.mEnabled;
     }
- }
+}
 
- Modifier.prototype = Object.create(Item.prototype);
- Modifier.prototype.constructor = Modifier;
+class WorldTarget
+{
+    constructor(w){
+        this.mWorld = w;
+        this.mSpeedMultiplier = 1.0;
+        this.mDisableActivators = false;
+    }
 
- function WorldTarget(w)
- {
-     this.mWorld = w;
-     this.mSpeedMultiplier = 1.0;
-     this.mDisableActivators = false;
-     
-     /**
-      * Speeds up all the processing by the given multiplier.
-      * @param multiplier Multiplier for advancing the time
-      * @return This target for chaining
-      */
-     this.speedBy(multiplier)
-     {
-         this.mSpeedMultiplier = multiplier;
-         return this;
-     }
-     
-     /**
-      * Disables all the activators
-      * @return This target for chaining
-      */
-     this.disableActivators()
-     {
-         this.mDisableActivators = true;
-         return this;
-     }
-     
-     /**
-      * Creates the actual modifier based on the given settings
-      * @return Modifier 
-      */
-     this.build()
-     {
-         var m = new worldModifier(this.mWorld);
-         m.mSpeedMultiplier = this.mSpeedMultiplier;
-         m.mDisableActivators = this.mDisableActivators;
-         
-         return m;
-     }
- }
+    /**
+     * Speeds up all the processing by the given multiplier.
+     * @param multiplier Multiplier for advancing the time
+     * @return This target for chaining
+     */
+    speedBy(multiplier)
+    {
+        this.mSpeedMultiplier = multiplier;
+        return this;
+    }
+    
+    /**
+     * Disables all the activators
+     * @return This target for chaining
+     */
+    disableActivators()
+    {
+        this.mDisableActivators = true;
+        return this;
+    }
+    
+    /**
+     * Creates the actual modifier based on the given settings
+     * @return Modifier 
+     */
+    build()
+    {
+        var m = new WorldModifier(this.mWorld);
+        m.mSpeedMultiplier = this.mSpeedMultiplier;
+        m.mDisableActivators = this.mDisableActivators;
+        
+        return m;
+    }
+}
  
  /**
   * A modifier settings class for generator modifiers.
   * Keeps track of all the parameters the modifier should
   * modify.
   */
- function GeneratorTarget(gen)
+ class GeneratorTarget
  {
-     this.mGenerator = gen;
-     this.mMultiplier = 1.0;
-     
-     /**
-      * Multiplies the production of the generator.
-      * 
-      * @param multiplier Multiplier
-      * @return This target for chaining
-      */
-     this.multiplier = function(multiplier)
-     {
-         this.mMultiplier = multiplier;
-         return this;
-     }
-     
-     /**
-      * Constructs the actual modifier with the given settings
-      * @return Modifier as per the given settings
-      */
-     this.build = function()
-     {
-         var m = new generatorModifier(this.mGenerator);
-         m.mMultiplier = this.mMultiplier;
-         return m;
-     }
+    constructor(gen){
+        this.mGenerator = gen;
+        this.mMultiplier = 1.0;
+    }
+    
+    /**
+     * Multiplies the production of the generator.
+     * 
+     * @param multiplier Multiplier
+     * @return This target for chaining
+     */
+    multiplier(multiplier)
+    {
+        this.mMultiplier = multiplier;
+        return this;
+    }
+    
+    /**
+     * Constructs the actual modifier with the given settings
+     * @return Modifier as per the given settings
+     */
+    build()
+    {
+        var m = new generatorModifier(this.mGenerator);
+        m.mMultiplier = this.mMultiplier;
+        return m;
+    }
  }
 
- var worldModifier = function(world)
+ class WorldModifier extends Modifier
  {
-     Modifier.call(this, world);
-     /**
-     * Modifier for worlds
-     */
-    this.mSpeedMultiplier;
-    this.mDisableActivators;
+    constructor(world){
+        /**
+         * Modifier for worlds
+         */
+        this.mSpeedMultiplier;
+        this.mDisableActivators;
 
-    this.mSpeedMultiplierBefore;
-    this.mSpeedMultiplierAfter;
+        this.mSpeedMultiplierBefore;
+        this.mSpeedMultiplierAfter;
+    }
 
     this.Builder = function(){
         self = this;
@@ -214,11 +215,12 @@
 /**
  * Modifier for generators.
  */
-var generatorModifier = function(generator)
+class GeneratorModifier extends Modifier
 {
-    Modifier.call(this);
-    this.mGenerator;// = generator;
-    this.mMultiplier = 1.0;
+    constructor (generator){
+        this.mGenerator;// = generator;
+        this.mMultiplier = 1.0;
+    }
     
     this.Builder = function(){
         self = this;
@@ -250,8 +252,6 @@ var generatorModifier = function(generator)
     }
 }
 
-generatorModifier.prototype = Object.create(Modifier.prototype);
-generatorModifier.prototype.constructor = generatorModifier;
 
 
 

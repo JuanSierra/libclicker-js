@@ -32,41 +32,39 @@ if (!Array.prototype.remove) {
   }
 }
 
-function World(){
+class World {
+    contructor () 
+    {
+        this.generators = [];
+        this.automators = [];
+        this.currencies = [];
+        this.modifiers = [];
+    
+        this._speedMultiplier = 1.0;
+        this._updateAutomators = true;
+    }
 
-    this.generators = [];
-    this.automators = [];
-    this.currencies = [];
-    this.modifiers = [];
-
-    this._speedMultiplier = 1.0;
-    this._updateAutomators = true;
-
-    /*this. World() {
-
-    }*/
-	
-	this.equals = function(a,b) {
+	equals (a,b) {
 		return JSON.stringify(a) === JSON.stringify(b);
 	}
 	
-    this.addGenerator = function(generator) {
+    addGenerator (generator) {
         if ( generator && !this.generators.contains(generator) ) {
             this.generators.push(generator);
         }
     }
 
-    this.getGeneratorCount = function() {
+    getGeneratorCount() {
         return this.generators.length;
     }
 
-    this.removeGenerator = function(generator) {
+    removeGenerator(generator) {
         if (generator && this.generators.contains(generator)) {
             this.generators.remove(generator);
         }
     }
 
-    this.removeAllGenerators = function() {
+    removeAllGenerators() {
         generators = [];
     }
 
@@ -74,7 +72,7 @@ function World(){
      * Registers a new currency in the world, making
      * the currency usable.
      */
-    this.addCurrency = function(c) {
+    addCurrency(c) {
         if (c && !this.currencies.contains(c) ) {
             this.currencies.push(c);
         }
@@ -83,7 +81,7 @@ function World(){
     /**
      * Removes a currency from the world.
      */
-    this.removeCurrency = function(c) {
+    removeCurrency(c) {
         if (c) {
             this.currencies.remove(c);
         }
@@ -97,7 +95,7 @@ function World(){
      * @param index of the currency
      * @return the currency at the given index, or null if not found
      */
-    this.getCurrency = function(index) {
+    getCurrency(index) {
         return this.currencies[index];
     }
 
@@ -107,14 +105,14 @@ function World(){
      *
      * @return list of currencies
      */
-    this.getCurrencies = function() {
+    getCurrencies() {
         return this.currencies;
     }
 
     /**
      * Removes all currencies registered in the world.
      */
-    this.removeAllCurrencies = function() {
+    removeAllCurrencies() {
         this.currencies = [];
     }
 
@@ -124,7 +122,7 @@ function World(){
      *
      * @param seconds Seconds to advance
      */
-    this.update = function(seconds) {
+    update(seconds) {
         seconds *= this._speedMultiplier;
 
         if (this._updateAutomators) {
@@ -139,7 +137,7 @@ function World(){
      *
      * @param automator to register
      */
-    this.addAutomator = function(automator) {
+    addAutomator(automator) {
         if (automator && !this.automators.contains(automator)) {
             this.automators.push(automator);
         }
@@ -150,7 +148,7 @@ function World(){
      *
      * @param modifier to register
      */
-    this.addModifier = function(modifier) {
+    addModifier(modifier) {
         if (modifier && !this.modifiers.contains(modifier)) {
             this.modifiers.push(modifier);
         }
@@ -161,7 +159,7 @@ function World(){
      *
      * @return the speed multiplier
      */
-    this.getSpeedMultiplier = function() {
+    getSpeedMultiplier() {
         return this._speedMultiplier;
     }
 
@@ -170,21 +168,21 @@ function World(){
      *
      * @param multiplier of the world update speed
      */
-    this.setSpeedMultiplier = function(multiplier) {
+    setSpeedMultiplier (multiplier) {
         this._speedMultiplier = multiplier;
     }
 
     /**
      * Disables all automators
      */
-    this.disableAutomators = function() {
+    disableAutomators() {
         this._updateAutomators = false;
     }
 
     /**
      * Enables all automators
      */
-    this.enableAutomators = function() {
+    enableAutomators() {
         this._updateAutomators = true;
     }
 
@@ -193,7 +191,7 @@ function World(){
      *
      * @param automator to remove
      */
-    this.removeAutomator = function(automator) {
+    removeAutomator(automator) {
         if (automator != null) {
             this.automators.remove(automator);
         }
@@ -204,7 +202,7 @@ function World(){
      *
      * @return list of automators
      */
-    this.getAutomators = function() {
+    getAutomators() {
         return this.automators;
     }
 
@@ -213,7 +211,7 @@ function World(){
      *
      * @return list of modifiers
      */
-    this.getModifiers = function() {
+    getModifiers() {
         return this.modifiers;
     }
 
@@ -222,7 +220,7 @@ function World(){
      *
      * @param modifier to remove
      */
-    this.removeModifier = function(modifier) {
+    removeModifier(modifier) {
         if (modifier) {
             this.modifiers.remove(modifier);
         }
@@ -233,7 +231,9 @@ function World(){
      *
      * @return True if automation is enabled, false otherwise.
      */
-    this.isAutomationEnabled = function() {
+    isAutomationEnabled() {
         return this._updateAutomators;
     }
 }
+
+export default World;

@@ -4,56 +4,57 @@
      * @param world World this item belongs to
      * @param name  Name of this item
      */
-function Item(world, name = "Nameless Item"){
-    /**
-     * World this item belongs to
-     */
-    this.world = world;
+class Item {
 
-    /**
-     * Modifiers applied to this item
-     */
-    this.modifiers = [];
+    contructor (world, name = "Nameless Item") {
+        /**
+         * World this item belongs to
+         */
+        this.world = world;
 
-    /**
-     * The base price of the item (i.e. the price of the first level of this item)
-     */
-    this.basePrice = 1;//BigInteger.ONE;
+        /**
+         * Modifiers applied to this item
+         */
+        this.modifiers = [];
 
-    /**
-     * Name of this item
-     */
-    this.name = name;
+        /**
+         * The base price of the item (i.e. the price of the first level of this item)
+         */
+        this.basePrice = 1;//BigInteger.ONE;
 
-    /**
-     * Description text for this item
-     */
-    this.description = "No description.";
+        /**
+         * Name of this item
+         */
+        this.name = name;
 
-    /**
-     * Current level of this item
-     */
-    this.itemLevel = 0;
+        /**
+         * Description text for this item
+         */
+        this.description = "No description.";
 
-    /**
-     * Max. item level
-     */
-    this.maxItemLevel = 99999999;//Long.MAX_VALUE;
+        /**
+         * Current level of this item
+         */
+        this.itemLevel = 0;
 
-    /**
-     * Price multiplier per level. This is used in the price formula
-     * like this: price = (base price) * (price multiplier) ^ (item level)
-     */
-    this.priceMultiplier = 1.145;
+        /**
+         * Max. item level
+         */
+        this.maxItemLevel = 99999999;//Long.MAX_VALUE;
 
-
+        /**
+         * Price multiplier per level. This is used in the price formula
+         * like this: price = (base price) * (price multiplier) ^ (item level)
+         */
+        this.priceMultiplier = 1.145;
+    }
 
     /**
      * Retrieves the name of this item
      *
      * @return Name of this item
      */
-    this.getName = function() {
+    getName() {
         return name;
     }
 
@@ -62,17 +63,17 @@ function Item(world, name = "Nameless Item"){
      *
      * @param name New name for this item
      */
-    this.setName = function(name) {
+    setName(name) {
         //if (name == null || name.length() == 0)
             //throw new RuntimeException("Item name cannot be null or empty");
         this.name = name;
     }
 
-    this.getDescription = function() {
+    getDescription() {
         return this.description;
     }
 
-    this.setDescription = function(description) {
+    setDescription(description) {
         this.description = description;
     }
 
@@ -81,21 +82,21 @@ function Item(world, name = "Nameless Item"){
      *
      * @return Base price of this item
      */
-    this.getBasePrice = function() {
+    getBasePrice() {
         return this.basePrice;
     }
 
-    this.setBasePrice = function(basePrice) {
+    setBasePrice(basePrice) {
         this.basePrice = basePrice;
     }
 
-    this.getPrice = function() {
+    getPrice() {
         var tmp = this.basePrice;
         tmp = tmp * Math.pow(this.priceMultiplier, this.itemLevel);
         return tmp;
     }
 
-    this.buyWith = function(currency) {
+    buyWith(currency) {
         //if (currency == null) throw new IllegalArgumentException("Currency cannot be null");
         if (this.itemLevel >= this.maxItemLevel)
             return 'MAX_LEVEL_REACHED';//PurchaseResult.MAX_LEVEL_REACHED;
@@ -116,14 +117,14 @@ function Item(world, name = "Nameless Item"){
      *
      * @param basePrice New base price for this item
      */
-    this.setBasePrice = function(basePrice) {
+    setBasePrice(basePrice) {
         //if (basePrice == null) throw new RuntimeException("Base price cannot be null");
         //if (basePrice == 0)
           //  throw new RuntimeException("Base price cannot be zero");
         this.basePrice = basePrice;
     }
 
-    this.setBasePrice = function(basePrice) {
+    setBasePrice(basePrice) {
         this.basePrice = basePrice;//new BigInteger("" + basePrice);
     }
 
@@ -132,7 +133,7 @@ function Item(world, name = "Nameless Item"){
      *
      * @return Price multiplier
      */
-    this.getPriceMultiplier = function() {
+    getPriceMultiplier() {
         return priceMultiplier;
     }
 
@@ -141,40 +142,42 @@ function Item(world, name = "Nameless Item"){
      *
      * @param multiplier Price multiplier
      */
-    this.setPriceMultiplier = function(multiplier) {
+    setPriceMultiplier(multiplier) {
         this.priceMultiplier = multiplier;
     }
 
-    this.getMaxItemLevel = function() {
+    getMaxItemLevel() {
         return this.maxItemLevel;
     }
 
-    this.setMaxItemLevel = function(maxLvl) {
+    setMaxItemLevel(maxLvl) {
         if (maxLvl <= 0) throw new RuntimeException("Max item level cannot be zero or negative");
         this.maxItemLevel = maxLvl;
     }
 
-    this.getItemLevel = function() {
+    getItemLevel() {
         return this.itemLevel;
     }
 
-    this.setItemLevel = function(lvl) {
+    setItemLevel(lvl) {
         this.itemLevel = lvl < 0 ? 0 : lvl > this.maxItemLevel ? this.maxItemLevel : lvl;
     }
 
-    this.upgrade = function() {
+    upgrade() {
         if (this.itemLevel < this.maxItemLevel) {
             this.itemLevel++;
         }
     }
 
-    this.downgrade = function() {
+    downgrade() {
         if (this.itemLevel > 0) {
             this.itemLevel--;
         }
     }
 
-    this.maximize = function() {
+    maximize() {
         this.itemLevel = this.maxItemLevel;
     }
 }
+
+export default Item;
