@@ -5,8 +5,7 @@
      * @param name  Name of this item
      */
 class Item {
-
-    contructor (world, name = "Nameless Item") {
+    constructor (world, name = "Nameless Item") {
         /**
          * World this item belongs to
          */

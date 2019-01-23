@@ -33,7 +33,7 @@ if (!Array.prototype.remove) {
 }
 
 class World {
-    contructor () 
+    constructor () 
     {
         this.generators = [];
         this.automators = [];

@@ -2,6 +2,7 @@ const World = require('./world');
 const Currency = require('./currency');
 const Generator = require('./generator');
 const Automator = require('./automator');
+const Modifier = require('./modifier');
 
 var world = new World();
 world.update(1.0 / 60.0);
@@ -26,3 +27,20 @@ var goldDigger = new Automator.Builder(world)
       
 // Advance the world by 30 seconds to make the automator work
 world.update(30.0);
+
+
+// Modifier Test
+
+var w = new World();
+var m = new Modifier.Builder()
+      .modify(w)
+      .speedBy(2.0)
+      .build();
+
+m.enable();
+
+w.update(10.0);
+
+m.disable();
+
+w.update(10.0);

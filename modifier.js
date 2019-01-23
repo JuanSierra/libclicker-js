@@ -21,6 +21,88 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+const Item = require('./item');
+const World = require('./world');
+const Generator = require('./generator');
+
+class WorldTarget
+{
+    constructor(world){
+        this.mWorld = world;
+        this.mSpeedMultiplier = 1.0;
+        this.mDisableActivators = false;
+    }
+
+    /**
+     * Speeds up all the processing by the given multiplier.
+     * @param multiplier Multiplier for advancing the time
+     * @return This target for chaining
+     */
+    speedBy(multiplier)
+    {
+        this.mSpeedMultiplier = multiplier;
+        return this;
+    }
+    
+    /**
+     * Disables all the activators
+     * @return This target for chaining
+     */
+    disableActivators()
+    {
+        this.mDisableActivators = true;
+        return this;
+    }
+    
+    /**
+     * Creates the actual modifier based on the given settings
+     * @return Modifier 
+     */
+    build()
+    {
+        var m = new WorldModifier(this.mWorld);
+        m.mSpeedMultiplier = this.mSpeedMultiplier;
+        m.mDisableActivators = this.mDisableActivators;
+        
+        return m;
+    }
+}
+    
+/**
+ * A modifier settings class for generator modifiers.
+ * Keeps track of all the parameters the modifier should
+ * modify.
+ */
+class GeneratorTarget
+{
+    constructor(gen){
+        mGenerator = gen;
+        this.mMultiplier = 1.0;
+    }
+    
+    /**
+     * Multiplies the production of the generator.
+     * 
+     * @param multiplier Multiplier
+     * @return This target for chaining
+     */
+    multiplier(multiplier)
+    {
+        this.mMultiplier = multiplier;
+        return this;
+    }
+    
+    /**
+     * Constructs the actual modifier with the given settings
+     * @return Modifier as per the given settings
+     */
+    build()
+    {
+        var m = new generatorModifier(this.mGenerator);
+        m.mMultiplier = this.mMultiplier;
+        return m;
+    }
+}
 
 /**
  * A base class for all the modifiers.
@@ -33,186 +115,35 @@
  */
  class Modifier extends Item
  {
-    var mEnable = false;
-
-    static class WorldModifier extends Modifier
-    {
-        /**
-            * Modifier for worlds
-            */
-        var mSpeedMultiplier;
-        var mDisableActivators;
-
-        var mSpeedMultiplierBefore;
-        var mSpeedMultiplierAfter;
-
-        constructor(world){
-            super(world);
-        }
-
-        onEnable()
-        {
-            if(self.mSpeedMultiplier != 1.0)
-            {
-                self.mSpeedMultiplierBefore = self.world.getSpeedMultiplier();
-                self.mSpeedMultiplierAfter = self.mSpeedMultiplier * self.mSpeedMultiplierBefore;
-                self.world.setSpeedMultiplier(mSpeedMultiplierAfter);
-            }
-            
-            if(mDisableActivators)
-            {
-                self.world.disableAutomators();
-            }
-        }
-    
-        onDisable()
-        {
-            if(self.mSpeedMultiplier != 1.0)
-            {
-                var d = self.world.getSpeedMultiplier();
-                d /= mSpeedMultiplier;
-                self.world.setSpeedMultiplier(d);
-            }
-
-            if(self.mDisableActivators)
-            {
-                self.world.enableAutomators();
-            }
-        }
-
-        modify(world)
-        {
-            return new WorldTarget(world);
-        }
+    constructor(world, name){
+        super(world, name);
+        this.mEnable = false;
     }
 
-    /**
-    * Modifier for generators.
-    */
-    static class GeneratorModifier extends Modifier
-    {
-        var mGenerator;
-        var mMultiplier = 1.0;
-
-        constructor (generator){
-            super(generator.getWorld());
-            mGenerator = generator;
-        }
-
-        onEnable()
+    static get Builder() {
+        class Builder
         {
-            mGenerator.attachModifier(this);
-        }
+            constructor(){}
 
-        onDisable()
-        {
-            mGenerator.detachModifier(this);
-        }
-
-        getMultiplier()
-        {
-            return mMultiplier;
-        }
-    }
-
-
-    static class Builder
-    {
-        static class WorldTarget
-        {
-            var mWorld;
-            var mSpeedMultiplier = 1.0;
-            var mDisableActivators = false;
-
-            constructor(world){
-                mWorld = world;
-            }
-        
-            /**
-             * Speeds up all the processing by the given multiplier.
-             * @param multiplier Multiplier for advancing the time
-             * @return This target for chaining
-             */
-            speedBy(multiplier)
-            {
-                mSpeedMultiplier = multiplier;
-                return this;
-            }
-            
-            /**
-             * Disables all the activators
-             * @return This target for chaining
-             */
-            disableActivators()
-            {
-                mDisableActivators = true;
-                return this;
-            }
-            
-            /**
-             * Creates the actual modifier based on the given settings
-             * @return Modifier 
-             */
-            build()
-            {
-                var m = new WorldModifier(this.mWorld);
-                m.mSpeedMultiplier = this.mSpeedMultiplier;
-                m.mDisableActivators = this.mDisableActivators;
+            modify(obj){
+                if(obj instanceof World)
+                    return new WorldTarget(obj);
                 
-                return m;
+                if(obj instanceof Generator)
+                    return new GeneratorTarget(obj);
             }
         }
-         
-         /**
-          * A modifier settings class for generator modifiers.
-          * Keeps track of all the parameters the modifier should
-          * modify.
-          */
-         static class GeneratorTarget
-         {
-            var mGenerator;
-            var mMultiplier = 1.0;
 
-            constructor(gen){
-                mGenerator = gen;
-            }
-            
-            /**
-             * Multiplies the production of the generator.
-             * 
-             * @param multiplier Multiplier
-             * @return This target for chaining
-             */
-            multiplier(multiplier)
-            {
-                mMultiplier = multiplier;
-                return this;
-            }
-            
-            /**
-             * Constructs the actual modifier with the given settings
-             * @return Modifier as per the given settings
-             */
-            build()
-            {
-                var m = new generatorModifier(this.mGenerator);
-                m.mMultiplier = this.mMultiplier;
-                return m;
-            }
-        }
-    }
-
-    constructor(world){
-        super(world);
+        return Builder;
     }
  
     /**
      * Enables this modifier, i.e. makes it active
      */
     enable() {
-        if(!mEnabled)
+        if(!this.mEnabled)
         {
-            mEnabled = true;
+            this.mEnabled = true;
             this.world.addModifier(this);
             this.onEnable();
         }
@@ -222,11 +153,11 @@
      * Disables this modifier, i.e. makes it inactive
      */
     disable() {
-        if(mEnabled)
+        if(this.mEnabled)
         { 
             this.onDisable();
             this.world.removeModifier(this);
-            mEnabled = false;
+            this.mEnabled = false;
         }
     }
     
@@ -234,12 +165,82 @@
      * Checks whether or not this modifier is enabled
      * @return True if enabled, false otherwise
      */
-    isEnabled (){
-        return mEnabled;
+    isEnabled() {
+        return this.mEnabled;
     }
 }
 
-export default Modifier;
+class WorldModifier extends Modifier{
+    constructor(world) {
+        super(world);
+                /**
+        * Modifier for worlds
+        */
+        this.mSpeedMultiplier;
+        this.mDisableActivators;
+
+        this.mSpeedMultiplierBefore;
+        this.mSpeedMultiplierAfter;
+    }
+
+    onEnable() {
+        if(this.mSpeedMultiplier != 1.0) {
+            this.mSpeedMultiplierBefore = this.world.getSpeedMultiplier();
+            this.mSpeedMultiplierAfter = this.mSpeedMultiplier * this.mSpeedMultiplierBefore;
+            this.world.setSpeedMultiplier(this.mSpeedMultiplierAfter);
+        }
+        
+        if(this.mDisableActivators) {
+            this.world.disableAutomators();
+        }
+    }
+
+    onDisable() {
+        if(this.mSpeedMultiplier != 1.0) {
+            var d = this.world.getSpeedMultiplier();
+            d /= this.mSpeedMultiplier;
+            this.world.setSpeedMultiplier(d);
+        }
+
+        if(this.mDisableActivators) {
+            this.world.enableAutomators();
+        }
+    }
+
+    modify(world) {
+        return new WorldTarget(world);
+    }
+}
+
+/**
+* Modifier for generators.
+*/
+class GeneratorModifier extends Modifier
+{
+    constructor (generator){
+        super(generator.getWorld());
+        this.mGenerator = generator;
+        var mMultiplier = 1.0;
+    }
+
+    onEnable()
+    {
+        mGenerator.attachModifier(this);
+    }
+
+    onDisable()
+    {
+        mGenerator.detachModifier(this);
+    }
+
+    getMultiplier()
+    {
+        return mMultiplier;
+    }
+}
+
+
+module.exports = Modifier;
 
 /*
     static class WorldModifier extends Modifier
@@ -258,7 +259,4 @@ export default Modifier;
         @Override
         
     }
-  */  
-    
-
-
+  */ 

@@ -12,7 +12,8 @@
 const Item = require('./item');
 
 class Generator extends Item {
-    contructor(build){
+    constructor(build){
+        super(build.mWorld, build.mName);
         this.itemLevel = build.itemLevel;
         this.maxItemLevel = build.maxItemLevel;
         this.modifiers = build.modifiers;
