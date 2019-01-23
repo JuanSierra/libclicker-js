@@ -180,4 +180,4 @@ class Item {
     }
 }
 
-export default Item;
+module.exports = Item;

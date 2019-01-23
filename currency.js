@@ -1,13 +1,13 @@
 class Currency
 {
-    constructor (){
-        this.name;
+    constructor (build){
+        this.name = build.name;
         //private BigInteger value = BigInteger.ZERO;
-        this.value;
-        this.world;
+        this.value = build.value;
+        this.world = build.world;
     }
 
-    static get Builder(world) {
+    static get Builder() {
         class Builder {
             constructor(world) {
                 /* 
@@ -22,13 +22,13 @@ class Currency
                 this.name = name;
                 return this;
             }
+
+            build() {
+                return new Currency(this);
+            }
         }
 
-        build() {
-            var c = new Currency(this);
-			
-            return c;
-        }
+        return Builder;
     }
 	
     getAmountAsString() {
@@ -61,4 +61,4 @@ class Currency
 	}
 }
 
-export default Currency;
+module.exports = Currency

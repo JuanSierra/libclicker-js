@@ -9,58 +9,36 @@
     }
 */
 
+const Item = require('./item');
+
 class Generator extends Item {
-    contructor(){
-        this.itemLevel;
-        this.maxItemLevel;
-        this.modifiers;
-        this.amountMultiplier;
-        this.useRemainder;
-        this.timesProcessed;
-        this.remainder;
-        
-        //modifiable
-        this.world;
-        this.name;
-        this.onProcessed;
-        this.resource;
-        this.baseAmount;
-        this.amountMultiplier;
-        this.maxLevel;//Long.MAX_VALUE;
-        this.basePrice;
-        this.priceMultiplier;
-        this.probability;
-        this.probabilitySet;
-        this.useRemainde;
-        this.cooldown;
+    contructor(build){
+        this.itemLevel = build.itemLevel;
+        this.maxItemLevel = build.maxItemLevel;
+        this.modifiers = build.modifiers;
+        this.amountMultiplier = build.amountMultiplier;
+        this.useRemainder = build.useRemainder;
+        this.timesProcessed = build.timesProcessed;
+        this.remainder = build.remainder;
     }
 
 	static get Builder() {
         class Builder {
-           constructor(world) {
-                this.itemLevel =0;
-                this.maxItemLevel = 999999999;
-                this.modifiers = [];
-                this.amountMultiplier = 0;
-                this.useRemainder = true;
-                this.timesProcessed = 0;
-                this.remainder = 0;
-            
-                //modifiable
-                this.world = world;
-                this.name = "Nameless generator";
-                this.onProcessed = null;
-                this.resource;
-                this.baseAmount = 1;
-                this.amountMultiplier = 1.1;
-                this.maxLevel = 999999999;//Long.MAX_VALUE;
-                this.basePrice = 1;
-                this.priceMultiplier = 1.1;
-                this.probability = 1.0;
-                this.probabilitySet = false;
-                this.useRemainder = true;
-                this.cooldown = 0.0;
-           }
+            constructor(world) {
+                this.mWorld = world;
+                this.mName = "Nameless generator";
+                this.mOnProcessed = null;
+                this.mCurrency = null;
+                this.mBaseAmount = 1;
+                this.mAmountMultiplier = 1.1;
+                this.mMaxLevel = 999999999;
+                this.mBasePrice = 999999999;//BigInteger.ONE;
+                this.mPriceMultiplier = 1.1;
+                this.mProbability = 1.0;
+                this.mProbabilitySet = false;
+                this.mUseRemainder = true;
+                this.mCooldown = 0.0;
+            }
             /**
              * Sets the cooldown of this generator (in seconds).
              * This is the minimum time between processing this
@@ -319,4 +297,4 @@ class Generator extends Item {
     }
 }
 
-export default Generator;
+module.exports = Generator;

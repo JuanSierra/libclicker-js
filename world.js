@@ -236,4 +236,4 @@ class World {
     }
 }
 
-export default World;
+module.exports = World
