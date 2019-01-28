@@ -1,0 +1,28 @@
+{
+  "name": "libclicker-js",
+  "version": "0.1.0",
+  "description": "Library for clicker games",
+  "main": "game.js",
+  "dependencies": {},
+  "devDependencies": {
+    "jest": "^24.0.0"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JuanSierra/libclicker_js.git"
+  },
+  "keywords": [
+    "game",
+    "clicker",
+    "idle"
+  ],
+  "author": "Juan Sierra",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/JuanSierra/libclicker_js/issues"
+  },
+  "homepage": "https://github.com/JuanSierra/libclicker_js#readme"
+}
