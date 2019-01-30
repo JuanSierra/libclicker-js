@@ -14,13 +14,17 @@ const Item = require('./item');
 class Generator extends Item {
     constructor(build){
         super(build.mWorld, build.mName);
-        this.itemLevel = build.itemLevel;
-        this.maxItemLevel = build.maxItemLevel;
-        this.modifiers = build.modifiers;
-        this.amountMultiplier = build.amountMultiplier;
-        this.useRemainder = build.useRemainder;
-        this.timesProcessed = build.timesProcessed;
-        this.remainder = build.remainder;
+
+        this.maxItemLevel = build.mMaxLevel;
+        this.amountMultiplier = build.mAmountMultiplier;
+        this.useRemainder = build.mUseRemainder;
+        this.timesProcessed = build.mTimesProcessed;
+        this.currency = build.mCurrency;
+        this.baseAmount = build.mBaseAmount;
+        
+
+        this.remainder = 0;
+        this.modifiers = [];
     }
 
 	static get Builder() {
@@ -39,6 +43,7 @@ class Generator extends Item {
                 this.mProbabilitySet = false;
                 this.mUseRemainder = true;
                 this.mCooldown = 0.0;
+                this.mTimesProcessed = 0;
             }
             /**
              * Sets the cooldown of this generator (in seconds).
@@ -134,7 +139,7 @@ class Generator extends Item {
              */
             generate(resource) { //throws IllegalArgumentException {
                 //if (resource == null) throw new IllegalArgumentException("Currency cannot be null");
-                this.resource = resource;
+                this.mCurrency = resource;
                 return this;
             }
 
@@ -270,10 +275,12 @@ class Generator extends Item {
      */
     process() {
         if (this.isWorking()) {
-            this.resource.generate(this.getGeneratedAmount());
+            this.currency.generate(this.getGeneratedAmount());
             this.timesProcessed++;
             //if (callback != null) callback.onProcessed();
         }
+
+        //console.log(this.timesProcessed)
     }
 
     /**

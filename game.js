@@ -4,6 +4,27 @@ const Generator = require('./generator');
 const Automator = require('./automator');
 const Modifier = require('./modifier');
 
+let world = new World();
+let c = new Currency.Builder(world)
+      .build();
+let g = new Generator.Builder(world)
+      .generate(c)
+      .build();
+g.upgrade();
+
+let a = new Automator.Builder(world)
+      .automate(g)
+      .every(1.0)
+      .build();
+a.upgrade();
+
+world.update(1.0);
+//expect(g.getTimesProcessed()).toBe(1);
+
+world.update(9.0);
+//expect(g.getTimesProcessed()).toBe(10);
+
+/*
 var world = new World();
 world.update(1.0 / 60.0);
 
@@ -44,3 +65,4 @@ w.update(10.0);
 m.disable();
 
 w.update(10.0);
+*/

@@ -44,11 +44,11 @@ class World {
         this._updateAutomators = true;
     }
 
-	equals (a,b) {
+	equals(a,b) {
 		return JSON.stringify(a) === JSON.stringify(b);
 	}
 	
-    addGenerator (generator) {
+    addGenerator(generator) {
         if ( generator && !this.generators.contains(generator) ) {
             this.generators.push(generator);
         }

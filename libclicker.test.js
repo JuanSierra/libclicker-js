@@ -39,14 +39,14 @@ test('Test Generation', () => {
         .generate(c)
         .build();
     
-    assertEquals(BigInteger.ZERO, g.getGeneratedAmount());
+    assertEquals(0, g.getGeneratedAmount());
     g.process();
-    assertEquals(BigInteger.ZERO, c.getValue());
+    assertEquals(0, c.getValue());
     
     g.upgrade();
-    assertEquals(new BigInteger("" + 100), g.getGeneratedAmount());
+    assertEquals(100, g.getGeneratedAmount());
     g.process();
-    assertEquals(new BigInteger("" + 100), c.getValue());
+    assertEquals(100, c.getValue());
     
     var amount = g.getGeneratedAmount();
     g.upgrade();

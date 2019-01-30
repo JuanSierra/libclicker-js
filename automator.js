@@ -12,6 +12,7 @@ class Automator extends Item
                 this.mWorld = world;
                 this.mGenerator;
                 this.mTickRate = 1.0;
+                this.mTickTimer = 1.0;
                 this.mName = "Nameless automator";
                 this.mEnabled = true;
                 this.mBasePrice = 999999999;//BigInteger.ONE;
@@ -53,13 +54,13 @@ class Automator extends Item
                 //if (generator == null) throw new IllegalStateException("Generator cannot be null");
                 var a = new Automator(this.mWorld, this.name);
                 a.generator = this.generator;
-                a.enabled = this.enabled;
+                a.enabled = this.mEnabled;
                 a.basePrice = this.basePrice;
                 a._priceMultiplier = this._priceMultiplier;
                 //console.log('mult '+ this._tickRateMultiplier)
                 a.multiplier = this._tickRateMultiplier;
                 a.tickRate = this.tickRate;
-                a.tickTimer = this.tickTimer;
+                a.tickTimer = this.mTickTimer;
                 a.actualTickRate = this.actualTickRate;
                 
                 this.mWorld.addAutomator(a);
@@ -91,7 +92,7 @@ class Automator extends Item
 
 	//this.super_upgrade = this.upgrade;
     upgrade() {
-        //super.upgrade(); //To change body of generated methods, choose Tools | Templates.
+        super.upgrade(); //To change body of generated methods, choose Tools | Templates.
 		//this.super_upgrade.call(this);
         this.actualTickRate = this.getFinalTickRate();
         console.log("Upgraded, final tick rate now: ");
@@ -107,7 +108,7 @@ class Automator extends Item
 
     update(delta){
         if (!this.enabled || this.itemLevel == 0) return;
-
+        
         this.tickTimer += delta;
         while (this.tickTimer >= this.actualTickRate) {
             this.tickTimer -= this.actualTickRate;
