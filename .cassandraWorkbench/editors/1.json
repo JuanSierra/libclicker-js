@@ -1,1 +1,0 @@
-{"body":"  SELECT rulebook_id, rule_id, conditions, description, result, rule_order\n  FROM svc_returns.rule_by_rulebook_id\n  WHERE rulebook_id=69133e73-6b3f-484c-8117-eddd4a3bc9c6;\n","clusterName":"Cluster AllowAllAuthenticator","filename":"script_2.cql","id":"12WYSPcjvMdboiIa","keyspace":"svc_returns","modified":true,"source":"action"}
