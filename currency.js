@@ -1,25 +1,22 @@
 class Currency
 {
     constructor (build){
-        this.name = build.name;
-        //private BigInteger value = BigInteger.ZERO;
-        this.value = build.value;
+        this.name = build.mName;
         this.world = build.world;
+        
+        // private BigInteger value = BigInteger.ZERO;
+        this.value = 0;
     }
 
     static get Builder() {
         class Builder {
             constructor(world) {
-                /* 
-                self.world = world;
-                self.name = "Gold";
-                self.value = 0;
-                */
+                this.mName = "Gold";
                 this.world = world;
             }
 
-            name (name) {
-                this.name = name;
+            name(name) {
+                this.mName = name;
                 return this;
             }
 

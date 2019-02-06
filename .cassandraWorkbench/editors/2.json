@@ -1,0 +1,1 @@
+{"body":"SELECT id, tenant_id, valid_from, description, is_default \nfrom svc_returns.rulebook_by_id;","clusterName":"Cluster AllowAllAuthenticator","filename":"script_1.cql","id":"YDtK6yOzkRAfdTEm","keyspace":"svc_returns","modified":true,"source":"action"}
