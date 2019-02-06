@@ -12,7 +12,7 @@ class Automator extends Item
                 this.mWorld = world;
                 this.mGenerator;
                 this.mTickRate = 1.0;
-                this.mTickTimer = 1.0;
+                this.mTickTimer = 0.0;
                 this.mName = "Nameless automator";
                 this.mEnabled = true;
                 this.mBasePrice = 999999999;//BigInteger.ONE;
@@ -108,11 +108,11 @@ class Automator extends Item
 
     update(delta){
         if (!this.enabled || this.itemLevel == 0) return;
-        
+
         this.tickTimer += delta;
         while (this.tickTimer >= this.actualTickRate) {
             this.tickTimer -= this.actualTickRate;
-            this.generator.process();
+            this.generator.process();    
         }
     }
 

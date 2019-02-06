@@ -279,8 +279,6 @@ class Generator extends Item {
             this.timesProcessed++;
             //if (callback != null) callback.onProcessed();
         }
-
-        //console.log(this.timesProcessed)
     }
 
     /**

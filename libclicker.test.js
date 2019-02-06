@@ -29,31 +29,32 @@ test('Testing automator', () => {
 test('Test Generation', () => {
     const w = new World();
     const c = new Currency.Builder(w).name("Gold").build();
-    const cf = new Formatter.ForCurrency(c)
-        .showHighestThousand()
-        .showDecimals()
-        .build();
+    //const cf = new Formatter.ForCurrency(c)
+    //    .showHighestThousand()
+    //    .showDecimals()
+    //    .build();
+
     const g = new Generator.Builder(w)
         .baseAmount(100)
         .multiplier(1.2)
         .generate(c)
         .build();
     
-    assertEquals(0, g.getGeneratedAmount());
+    expect(g.getGeneratedAmount()).toBe(0);
     g.process();
-    assertEquals(0, c.getValue());
-    
+    expect(c.value).toBe(0);
+
     g.upgrade();
-    assertEquals(100, g.getGeneratedAmount());
+    expect(g.getGeneratedAmount()).toBe(100);
     g.process();
-    assertEquals(100, c.getValue());
-    
+    expect(c.value, 100);
+
     var amount = g.getGeneratedAmount();
     g.upgrade();
     g.process();
     amount = amount.add(g.getGeneratedAmount());
     // assertEquals(amount, c.getValue());
-    assertEquals(amount, c.getValue());
+    expect(c.value).toBe(amount);
 });
 
 test('Test remainder usage', () => {
@@ -70,20 +71,20 @@ test('Test remainder usage', () => {
     
     // Set to level 2
     g.setItemLevel(2);
-    expect(c.getValue()).toBe(0);
+    expect(c.value).toBe(0);
 
     g.process();
-    expect(c.getValue()).toBe(1);
+    expect(c.value).toBe(1);
     
     g.process();
-    expect(c.getValue()).toBe(2);
+    expect(c.value).toBe(2);
     
     g.process();
-    expect(c.getValue()).toBe(4);
+    expect(c.value).toBe(4);
     
     g.process();
-    expect(c.getValue()).toBe(5);
+    expect(c.value).toBe(5);
     
     g.process();
-    expect(c.getValue()).toBe(6);
+    expect(c.value).toBe(6);
 });

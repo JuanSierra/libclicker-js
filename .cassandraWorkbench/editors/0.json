@@ -1,0 +1,1 @@
+{"body":"  SELECT *\r\n  FROM svc_returns.rule_by_id;","clusterName":"Cluster AllowAllAuthenticator","filename":"script_3.cql","id":"BYOXTjHvsQRD3E91","keyspace":"svc_returns","modified":true,"source":"action"}

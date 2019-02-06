@@ -17,11 +17,12 @@ let a = new Automator.Builder(world)
       .every(1.0)
       .build();
 a.upgrade();
-
+console.log(g.getTimesProcessed())
 world.update(1.0);
+//console.log(g.getTimesProcessed())
 //expect(g.getTimesProcessed()).toBe(1);
 
-world.update(9.0);
+//world.update(9.0);
 //expect(g.getTimesProcessed()).toBe(10);
 
 /*
