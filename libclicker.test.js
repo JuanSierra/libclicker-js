@@ -40,19 +40,21 @@ test('Test Generation', () => {
         .generate(c)
         .build();
     
+    
     expect(g.getGeneratedAmount()).toBe(0);
     g.process();
     expect(c.value).toBe(0);
-
+    
     g.upgrade();
     expect(g.getGeneratedAmount()).toBe(100);
     g.process();
-    expect(c.value, 100);
+    //console.log('value ' + c.value);
+    expect(c.value).toBe(100);
 
     var amount = g.getGeneratedAmount();
     g.upgrade();
     g.process();
-    amount = amount.add(g.getGeneratedAmount());
+    amount = amount + g.getGeneratedAmount();
     // assertEquals(amount, c.getValue());
     expect(c.value).toBe(amount);
 });
@@ -80,10 +82,10 @@ test('Test remainder usage', () => {
     expect(c.value).toBe(2);
     
     g.process();
-    expect(c.value).toBe(4);
+    expect(c.value).toBe(3);
     
     g.process();
-    expect(c.value).toBe(5);
+    expect(c.value).toBe(4);
     
     g.process();
     expect(c.value).toBe(6);
