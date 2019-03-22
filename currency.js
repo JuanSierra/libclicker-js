@@ -37,7 +37,7 @@ class Currency
         return name + ": " + getAmountAsString();
     }*/
 
-    generate(amount) {
+    add(amount) {
         this.value = this.value + amount;
     }
 
@@ -46,7 +46,7 @@ class Currency
     }
 
     multiply(multiplier) {
-        this.value = tmp * multiplier;
+        this.value = this.value * multiplier;
     }
 
     set(newValue) {
