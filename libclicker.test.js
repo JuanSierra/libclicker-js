@@ -90,3 +90,52 @@ test('Test remainder usage', () => {
     g.process();
     expect(c.value).toBe(6);
 });
+
+test('Currency Testing getName', () => {
+    let world = new World();
+    let instance = new Currency.Builder(world)
+        .name("TestCurrency")
+        .build();
+    let result = instance.name;
+
+    expect(result).toBe("TestCurrency");
+});
+
+test('Currency Test Arithmetic', () => {
+    let world = new World();
+    let c = new Currency.Builder(world)
+        .build();
+
+    c.add(1);
+    expect(c.value).toBe(1);
+
+    c.add(12344);
+    expect(c.value).toBe(12345);
+
+    c.sub(300);
+    expect(c.value).toBe(12045);
+
+    c.set(100);
+    expect(c.value).toBe(100);
+
+    c.multiply(2.0);
+    expect(c.value).toBe(200);
+
+    c.multiply(1.145);
+    let targetVal = parseInt(1.145 * 200);
+    expect(c.value).toBe(targetVal);
+});
+
+test('Modifier Test SingleWorldSpeed', () => {
+    let world = new World();
+    let m = new Modifier.Builder()
+        .modify(world)
+        .speedBy(2.0)
+        .build();
+
+    m.enable();
+    expect(world.getSpeedMultiplier()).toBeCloseTo(1.0 * 2.0);
+
+    m.disable();
+    expect(world.getSpeedMultiplier()).toBeCloseTo(1.0);
+});

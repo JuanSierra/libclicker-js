@@ -277,7 +277,7 @@ class Generator extends Item {
      */
     process() {
         if (this.isWorking()) {
-            this.currency.generate(this.getGeneratedAmount());
+            this.currency.add(this.getGeneratedAmount());
             this.timesProcessed++;
             //if (callback != null) callback.onProcessed();
         }
