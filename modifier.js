@@ -76,7 +76,7 @@ class WorldTarget
 class GeneratorTarget
 {
     constructor(gen){
-        mGenerator = gen;
+        this.mGenerator = gen;
         this.mMultiplier = 1.0;
     }
     
@@ -98,7 +98,7 @@ class GeneratorTarget
      */
     build()
     {
-        var m = new generatorModifier(this.mGenerator);
+        var m = new GeneratorModifier(this.mGenerator);
         m.mMultiplier = this.mMultiplier;
         return m;
     }
@@ -173,7 +173,7 @@ class GeneratorTarget
 class WorldModifier extends Modifier{
     constructor(world) {
         super(world);
-                /**
+        /**
         * Modifier for worlds
         */
         this.mSpeedMultiplier;
@@ -218,24 +218,24 @@ class WorldModifier extends Modifier{
 class GeneratorModifier extends Modifier
 {
     constructor (generator){
-        super(generator.getWorld());
+        super(generator.world);
         this.mGenerator = generator;
-        var mMultiplier = 1.0;
+        this.mMultiplier = 1.0;
     }
 
     onEnable()
     {
-        mGenerator.attachModifier(this);
+        this.mGenerator.attachModifier(this);
     }
 
     onDisable()
     {
-        mGenerator.detachModifier(this);
+        this.mGenerator.detachModifier(this);
     }
 
     getMultiplier()
     {
-        return mMultiplier;
+        return this.mMultiplier;
     }
 }
 

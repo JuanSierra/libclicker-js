@@ -248,7 +248,10 @@ class Generator extends Item {
         if (this.modifiers.length == 0) return val;
 
         for (var m in this.modifiers) {
-            var d = m.getMultiplier();
+            //var d = this.modifiers[m].getMultiplier();    NEED TO ALLOW THE METHOD
+            console.log(this.modifiers[m])
+            var d = this.modifiers[m].mMultiplier;
+
             if (d != 1.0) {
                 val = val * d;
             }

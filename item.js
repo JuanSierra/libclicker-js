@@ -1,3 +1,5 @@
+const PurchaseResult = require('./PurchaseResult');
+
 /**
      * Constructs a new item
      *
@@ -54,7 +56,7 @@ class Item {
      * @return Name of this item
      */
     getName() {
-        return name;
+        return this.name;
     }
 
     /**
@@ -98,17 +100,17 @@ class Item {
     buyWith(currency) {
         //if (currency == null) throw new IllegalArgumentException("Currency cannot be null");
         if (this.itemLevel >= this.maxItemLevel)
-            return 'MAX_LEVEL_REACHED';//PurchaseResult.MAX_LEVEL_REACHED;
+            return PurchaseResult.MAX_LEVEL_REACHED;
 
         var price = this.getPrice();
         var result = currency.value - price;
 		
         if (result < 0) {
-            return "INSUFFICIENT_FUNDS";
+            return PurchaseResult.INSUFFICIENT_FUNDS;
         }
         currency -= price;//currency.sub(price);
         this.upgrade();
-        return 'OK'//PurchaseResult.OK;
+        return PurchaseResult.OK;
     }
 
     /**
@@ -133,7 +135,7 @@ class Item {
      * @return Price multiplier
      */
     getPriceMultiplier() {
-        return priceMultiplier;
+        return this.priceMultiplier;
     }
 
     /**
