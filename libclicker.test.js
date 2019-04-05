@@ -139,3 +139,107 @@ test('Modifier Test SingleWorldSpeed', () => {
     m.disable();
     expect(world.getSpeedMultiplier()).toBeCloseTo(1.0);
 });
+
+
+test('Modifier Test MultipleWorldSpeed', () => {
+    let world = new World();
+    let m = new Modifier.Builder()
+        .modify(world)
+        .speedBy(2.0)
+        .build();
+
+    let m2 = new Modifier.Builder()
+        .modify(world)
+        .speedBy(3.0)
+        .build();
+    
+    m.enable();
+    m2.enable();
+    expect(world.getSpeedMultiplier()).toBeCloseTo(1.0 * 2.0 * 3.0);
+    
+    m.disable();
+    expect(world.getSpeedMultiplier()).toBeCloseTo(1.0 * 3.0);
+
+    m2.disable();
+    expect(world.getSpeedMultiplier()).toBeCloseTo(1.0);
+});
+
+
+test('Modifier Test Disable AllAutomators', () => {
+    let world = new World();
+    let c = new Currency.Builder(world)
+            .name("Gold")
+            .build();
+    
+    let g = new Generator.Builder(world)
+            .generate(c)
+            .baseAmount(1)
+            .build();
+    g.upgrade();
+
+    let a = new Automator.Builder(world)
+            .automate(g)
+            .every(1.0)
+            .build();
+    a.upgrade();
+
+    expect(c.value).toBe(0);
+
+    world.update(10.0);
+    expect(c.value).toBe(10);
+
+    let m = new Modifier.Builder()
+        .modify(world)
+        .disableActivators()
+        .build();
+    m.enable();
+    world.update(10.0);
+    expect(c.value).toBe(10);
+
+    m.disable();
+    world.update(10.0);
+    expect(c.value).toBe(20);
+});
+
+test('Modifier Test SpeedGenerators', () => {
+    let world = new World();
+    let c = new Currency.Builder(world)
+        .name("Gold")
+        .build();
+
+    let g = new Generator.Builder(world)
+        .baseAmount(1)
+        .generate(c)
+        .build();
+    g.upgrade();
+    g.process();
+    expect(c.value).toBe(1);
+    
+    console.log('MODIFIER');
+    let m = new Modifier.Builder()
+    .modify(g)
+    .multiplier(2.0)
+    .build();
+    m.enable();
+    g.process();
+
+    expect(c.value).toBe(3);
+
+    m.disable();
+    g.process();
+    expect(c.value).toBe(4);
+});
+
+test('Modifier Test IsEnabled', () => {
+    let world = new World();
+    let m = new Modifier.Builder()
+        .modify(world)
+        .build();
+    expect(m.isEnabled()).toBeFalsy();
+
+    m.enable();
+    expect(m.isEnabled()).toBeTruthy();
+    
+    m.disable();
+    expect(m.isEnabled()).toBeFalsy();
+});
