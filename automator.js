@@ -95,7 +95,6 @@ class Automator extends Item
         super.upgrade(); //To change body of generated methods, choose Tools | Templates.
 		//this.super_upgrade.call(this);
         this.actualTickRate = this.getFinalTickRate();
-        console.log("Upgraded, final tick rate now: ");
     }
 
     getFinalTickRate() {

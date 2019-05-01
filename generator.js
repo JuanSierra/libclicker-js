@@ -238,7 +238,6 @@ class Generator extends Item {
                 tmp = tmp + 1;
             }
         }
-
         tmp = this.processModifiers(tmp);
 
         return parseInt(tmp);
@@ -247,10 +246,8 @@ class Generator extends Item {
     processModifiers(val) {
         if (this.modifiers.length == 0) return val;
 
-        for (var m in this.modifiers) {
-            //var d = this.modifiers[m].getMultiplier();    NEED TO ALLOW THE METHOD
-            console.log(this.modifiers[m])
-            var d = this.modifiers[m].mMultiplier;
+        for(var i = 0; i<this.modifiers.length; i++){
+            var d = this.modifiers[i].getMultiplier();
 
             if (d != 1.0) {
                 val = val * d;

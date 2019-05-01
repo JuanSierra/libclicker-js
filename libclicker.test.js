@@ -48,7 +48,6 @@ test('Test Generation', () => {
     g.upgrade();
     expect(g.getGeneratedAmount()).toBe(100);
     g.process();
-    //console.log('value ' + c.value);
     expect(c.value).toBe(100);
 
     var amount = g.getGeneratedAmount();
@@ -213,9 +212,9 @@ test('Modifier Test SpeedGenerators', () => {
         .build();
     g.upgrade();
     g.process();
+
     expect(c.value).toBe(1);
     
-    console.log('MODIFIER');
     let m = new Modifier.Builder()
     .modify(g)
     .multiplier(2.0)
