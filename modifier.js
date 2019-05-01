@@ -153,6 +153,7 @@ class GeneratorTarget
      * Disables this modifier, i.e. makes it inactive
      */
     disable() {
+        
         if(this.mEnabled)
         { 
             this.onDisable();
@@ -197,6 +198,7 @@ class WorldModifier extends Modifier{
 
     onDisable() {
         if(this.mSpeedMultiplier != 1.0) {
+            
             var d = this.world.getSpeedMultiplier();
             d /= this.mSpeedMultiplier;
             this.world.setSpeedMultiplier(d);

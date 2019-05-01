@@ -24,10 +24,10 @@ if (!Array.prototype.indexOf) {
 
 if (!Array.prototype.remove) {
   Array.prototype.remove = function(element) {
-	var i = this.indexOf(this, element);
-	
+    var i = this.indexOf(element);
+    
 	if(i>=0){
-		this.slice(i, 1);
+        this.splice(i, 1);
 	}
   }
 }
