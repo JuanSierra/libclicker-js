@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: world.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: world.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>if (!Array.prototype.contains) {
+  Array.prototype.contains = function(element) {
+	for(var i in this){
+		if (element === this[i]){
+			return true;
+		}
+	}
+	
+	return false;
+  }
+}
+
+if (!Array.prototype.indexOf) {
+  Array.prototype.indexOf = function(element) {
+	for(var i in this){
+		if (element === this[i]){
+			return i;
+		}
+	}
+	
+	return -1;
+  }
+}
+
+if (!Array.prototype.remove) {
+  Array.prototype.remove = function(element) {
+    var i = this.indexOf(element);
+    
+	if(i>=0){
+        this.splice(i, 1);
+	}
+  }
+}
+
+class World {
+    constructor () 
+    {
+        this.generators = [];
+        this.automators = [];
+        this.currencies = [];
+        this.modifiers = [];
+    
+        this._speedMultiplier = 1.0;
+        this._updateAutomators = true;
+    }
+
+	equals(a,b) {
+		return JSON.stringify(a) === JSON.stringify(b);
+	}
+	
+    addGenerator(generator) {
+        if ( generator &amp;&amp; !this.generators.contains(generator) ) {
+            this.generators.push(generator);
+        }
+    }
+
+    getGeneratorCount() {
+        return this.generators.length;
+    }
+
+    removeGenerator(generator) {
+        if (generator &amp;&amp; this.generators.contains(generator)) {
+            this.generators.remove(generator);
+        }
+    }
+
+    removeAllGenerators() {
+        generators = [];
+    }
+
+    /**
+     * Registers a new currency in the world, making
+     * the currency usable.
+     */
+    addCurrency(c) {
+        if (c &amp;&amp; !this.currencies.contains(c) ) {
+            this.currencies.push(c);
+        }
+    }
+	
+    /**
+     * Removes a currency from the world.
+     */
+    removeCurrency(c) {
+        if (c) {
+            this.currencies.remove(c);
+        }
+    }
+
+    /**
+     * Retrieves a currency at the given index.
+     * The index is based on the order in which
+     * the currencies were added to the world.
+     *
+     * @param index of the currency
+     * @return the currency at the given index, or null if not found
+     */
+    getCurrency(index) {
+        return this.currencies[index];
+    }
+
+    /**
+     * Retrieves a list of all the currencies currently
+     * registered in the world.
+     *
+     * @return list of currencies
+     */
+    getCurrencies() {
+        return this.currencies;
+    }
+
+    /**
+     * Removes all currencies registered in the world.
+     */
+    removeAllCurrencies() {
+        this.currencies = [];
+    }
+
+    /**
+     * Advances the world state by the given amount of seconds.
+     * Useful when calculating away-from-keyboard income etc.
+     *
+     * @param seconds Seconds to advance
+     */
+    update(seconds) {
+        seconds *= this._speedMultiplier;
+
+        if (this._updateAutomators) {
+            this.automators.forEach(function(a){
+                a.update(seconds);
+            });
+        }
+    }
+
+    /**
+     * Registers a new automator to the world.
+     *
+     * @param automator to register
+     */
+    addAutomator(automator) {
+        if (automator &amp;&amp; !this.automators.contains(automator)) {
+            this.automators.push(automator);
+        }
+    }
+
+    /**
+     * Registers a new modifier
+     *
+     * @param modifier to register
+     */
+    addModifier(modifier) {
+        if (modifier &amp;&amp; !this.modifiers.contains(modifier)) {
+            this.modifiers.push(modifier);
+        }
+    }
+
+    /**
+     * Retrieves the global speed multiplier
+     *
+     * @return the speed multiplier
+     */
+    getSpeedMultiplier() {
+        return this._speedMultiplier;
+    }
+
+    /**
+     * Sets the global speed multiplier
+     *
+     * @param multiplier of the world update speed
+     */
+    setSpeedMultiplier (multiplier) {
+        this._speedMultiplier = multiplier;
+    }
+
+    /**
+     * Disables all automators
+     */
+    disableAutomators() {
+        this._updateAutomators = false;
+    }
+
+    /**
+     * Enables all automators
+     */
+    enableAutomators() {
+        this._updateAutomators = true;
+    }
+
+    /**
+     * Removes an automator from the world
+     *
+     * @param automator to remove
+     */
+    removeAutomator(automator) {
+        if (automator != null) {
+            this.automators.remove(automator);
+        }
+    }
+
+    /**
+     * Retrieves all the automators registered in the world
+     *
+     * @return list of automators
+     */
+    getAutomators() {
+        return this.automators;
+    }
+
+    /**
+     * Retrieves all the modifiers registered in the world
+     *
+     * @return list of modifiers
+     */
+    getModifiers() {
+        return this.modifiers;
+    }
+
+    /**
+     * Removes a modifier from the world
+     *
+     * @param modifier to remove
+     */
+    removeModifier(modifier) {
+        if (modifier) {
+            this.modifiers.remove(modifier);
+        }
+    }
+
+    /**
+     * Queries whether or not the automators are enabled.
+     *
+     * @return True if automation is enabled, false otherwise.
+     */
+    isAutomationEnabled() {
+        return this._updateAutomators;
+    }
+}
+
+module.exports = World</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Item.html">Item</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.1</a> on Wed May 15 2019 13:00:31 GMT+0100 (GMT+01:00)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

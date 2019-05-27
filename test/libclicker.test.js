@@ -1,8 +1,8 @@
-const World = require('./world');
-const Currency = require('./currency');
-const Generator = require('./generator');
-const Automator = require('./automator');
-const Modifier = require('./modifier');
+const World = require('../src/world');
+const Currency = require('../src/currency');
+const Generator = require('../src/generator');
+const Automator = require('../src/automator');
+const Modifier = require('../src/modifier');
 
 test('Testing automator', () => {
     let world = new World();
