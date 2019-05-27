@@ -1,8 +1,8 @@
-const World = require('./world');
-const Currency = require('./currency');
-const Generator = require('./generator');
-const PurchaseResult = require('./PurchaseResult');
-const Item = require('./item');
+const World = require('../src/world');
+const Currency = require('../src/currency');
+const Generator = require('../src/generator');
+const PurchaseResult = require('../src/PurchaseResult');
+const Item = require('../src/item');
 
 class ItemImpl extends Item
 {

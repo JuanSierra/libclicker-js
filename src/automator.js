@@ -22,31 +22,37 @@ class Automator extends Item
 
             basePrice(name) {
                 this.basePrice = name;
+                
                 return this;
             }
             
             priceMultiplier(multiplier) {
                 this._priceMultiplier = multiplier;
+
                 return this;
             }
             
             tickRateMultiplier(multiplier) {
                 this._tickRateMultiplier  = multiplier;
+
                 return this;
             }
             
             automate(generator) {
                 this.generator  = generator;
+
                 return this;
             }
 
             name(name) {
                 this.name = name;
+
                 return this;
             }
             
             every(seconds) {
                 this.tickRate = seconds;
+
                 return this;
             }
             
