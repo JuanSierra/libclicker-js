@@ -1,11 +1,14 @@
 const PurchaseResult = require('./PurchaseResult');
 
 /**
- * An item
+ * Base class for all the purchasable "items".
+ * 
+ * @author Harri Pellikka
  */
 class Item {
-     /**
-     * @param  {World} the world
+    /**
+     * Constructs a new item
+     * @param world World this item belongs to
      */
     constructor (world, name = "Nameless Item") {
         /**
