@@ -1,5 +1,16 @@
 const Item = require('./item');
 
+/**
+ * Automator class for automating generators.
+ * 
+ * Normally generators are manually controlled, i.e. they generate resources
+ * when explicitly told to. Automators are used to trigger generators
+ * during the world's update cycles.
+ * 
+ * @public
+ * @class
+ * @author Harri Pellikka
+ */
 class Automator extends Item
 {
     constructor(world, name){
@@ -8,6 +19,10 @@ class Automator extends Item
 
     static get Builder() {
         class Builder {
+            /**
+             * Constructs a new automator builder
+             * @param world World the automator belongs to
+             */
             constructor(world){
                 this.mWorld = world;
                 this.mGenerator;
@@ -38,24 +53,47 @@ class Automator extends Item
                 return this;
             }
             
+            /**
+             * Sets the target generator this automator should automate.
+             * 
+             * @param generator Generator to automate
+             * @return This builder for chaining
+             */
             automate(generator) {
                 this.generator  = generator;
 
                 return this;
             }
 
+            /**
+             * Sets the name for this automator.
+             * 
+             * @param name Name
+             * @return This builder for chaining
+             */
             name(name) {
                 this.name = name;
 
                 return this;
             }
-            
+             
+            /**
+             * Sets the tick rate of this automator, i.e. how often
+             * this automator should do its business.
+             * 
+             * @param seconds Tick rate in seconds
+             * @return This builder for chaining
+             */
             every(seconds) {
                 this.tickRate = seconds;
 
                 return this;
             }
             
+            /**
+             * Constructs the automator based on the given properties.
+             * @return The automator
+             */
             build() {
                 //if (generator == null) throw new IllegalStateException("Generator cannot be null");
                 var a = new Automator(this.mWorld, this.name);
@@ -78,7 +116,10 @@ class Automator extends Item
         return Builder;
     }
 
-    
+    /**
+     * Enables this automator. Automators are enabled by default when
+     * they are created.
+     */
     enable() {
         if (!this.enabled) {
             this.world.addAutomator(this);
@@ -121,15 +162,30 @@ class Automator extends Item
         }
     }
 
+    /**
+     * Retrieves the tick rate of this automator.
+     * @return Tick rate in seconds
+     */
     getTickRate() {
         return this.tickRate;
     }
 
+    /**
+     * Sets the tick rate of this automator.
+     * 
+     * @param tickRate Tick rate in seconds
+     */
     setTickRate(tickRate) {
         this.tickRate = tickRate;
         if (this.tickRate < 0.0) this.tickRate = 0.0;
     }
 
+    /**
+     * Retrieves the percentage of the tick. Useful
+     * when creating progress bars for generators.
+     * 
+     * @return Percentage of tick completion
+     */
     getTimerPercentage() {
         return this.tickRate != 0.0 ? this.tickTimer / this.tickRate : 1.0;
     }
