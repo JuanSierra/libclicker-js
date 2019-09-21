@@ -243,22 +243,3 @@ class GeneratorModifier extends Modifier
 
 
 module.exports = Modifier;
-
-/*
-    static class WorldModifier extends Modifier
-    {
-        private double mSpeedMultiplier;
-        private boolean mDisableActivators;
-        
-        private double mSpeedMultiplierBefore;
-        private double mSpeedMultiplierAfter;
-        
-        WorldModifier(World world)
-        {
-            super(world);
-        }
-
-        @Override
-        
-    }
-  */ 

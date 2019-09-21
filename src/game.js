@@ -18,15 +18,12 @@ let a = new Automator.Builder(world)
       .build();
 a.upgrade();
 console.log(g.getTimesProcessed())
+
 world.update(1.0);
-//console.log(g.getTimesProcessed())
-//expect(g.getTimesProcessed()).toBe(1);
+console.log(g.getTimesProcessed())
+world.update(9.0);
 
-//world.update(9.0);
-//expect(g.getTimesProcessed()).toBe(10);
-
-/*
-var world = new World();
+world = new World();
 world.update(1.0 / 60.0);
 
 // Creates a new currency called "Gold"
@@ -50,7 +47,6 @@ var goldDigger = new Automator.Builder(world)
 // Advance the world by 30 seconds to make the automator work
 world.update(30.0);
 
-
 // Modifier Test
 
 var w = new World();
@@ -66,4 +62,3 @@ w.update(10.0);
 m.disable();
 
 w.update(10.0);
-*/
