@@ -1,14 +1,3 @@
-/*
-    private Generator(World world) {
-        super(world);
-    }
-
-
-    private Generator(World world, String name) {
-        super(world, name);
-    }
-*/
-
 const Item = require('./item');
 
 class Generator extends Item {
@@ -125,7 +114,7 @@ class Generator extends Item {
              * @return This builder for chaining
              */
             baseAmount(amount) {
-                //if (amount == null) throw new IllegalArgumentException("Base amount cannot be null");
+                if (amount == null) throw "Base amount cannot be null";
                 this.mBaseAmount = amount;
                 return this;
             }
@@ -138,7 +127,7 @@ class Generator extends Item {
              * @throws IllegalArgumentException Thrown if the currency is null
              */
             generate(resource) { //throws IllegalArgumentException {
-                //if (resource == null) throw new IllegalArgumentException("Currency cannot be null");
+                if (resource == null) throw "Currency cannot be null";
                 this.mCurrency = resource;
                 return this;
             }
@@ -172,8 +161,9 @@ class Generator extends Item {
              * @return This builder for chaining
              */
             probability(probability) {
-                //if (probability < 0 || probability > 1.0)
-                //    throw new IllegalArgumentException("Probability should be between 0.0 and 1.0");
+                if (probability < 0 || probability > 1.0)
+                    throw "Probability should be between 0.0 and 1.0";
+
                 this.probability = probability;
                 this.probabilitySet = true;
                 
@@ -191,14 +181,6 @@ class Generator extends Item {
 	equals(a,b) {
 		return JSON.stringify(a) === JSON.stringify(b);
 	}
-	
-	/*this.itemLevel =0;
-	this.maxItemLevel =0;
-	this.modifiers = [];
-	this.amountMultiplier = 0;
-	this.useRemainder = true;
-	this.timesProcessed = 0;
-	this.remainder = 0;*/
 	
 	upgrade() {
 		if (this.itemLevel < this.maxItemLevel) {
@@ -229,8 +211,6 @@ class Generator extends Item {
         tmp = tmp * Math.pow(this.amountMultiplier, this.itemLevel - 1);
 
         if (this.useRemainder) {
-			//if 1 divided in tmp
-            //var tmpRem = tmp.remainder(BigDecimal.ONE).doubleValue();
             var tmpRem = tmp % 1;
             this.remainder += tmpRem;
             if (this.remainder >= 0.999) {

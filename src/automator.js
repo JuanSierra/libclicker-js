@@ -140,7 +140,6 @@ class Automator extends Item
 	//this.super_upgrade = this.upgrade;
     upgrade() {
         super.upgrade(); //To change body of generated methods, choose Tools | Templates.
-		//this.super_upgrade.call(this);
         this.actualTickRate = this.getFinalTickRate();
     }
 

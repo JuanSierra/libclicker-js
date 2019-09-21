@@ -3,8 +3,6 @@ class Currency
     constructor (build){
         this.name = build.mName;
         this.world = build.world;
-        
-        // private BigInteger value = BigInteger.ZERO;
         this.value = 0;
     }
 
@@ -31,11 +29,6 @@ class Currency
     getAmountAsString() {
         return this.value.toString();
     }
-
-    /*@Override
-    public String toString() {
-        return name + ": " + getAmountAsString();
-    }*/
 
     add(amount) {
         this.value = this.value + amount;

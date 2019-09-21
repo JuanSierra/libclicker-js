@@ -128,9 +128,10 @@ class Item {
      * @param basePrice New base price for this item
      */
     setBasePrice(basePrice) {
-        //if (basePrice == null) throw new RuntimeException("Base price cannot be null");
-        //if (basePrice == 0)
-          //  throw new RuntimeException("Base price cannot be zero");
+        if (basePrice == null) throw "Base price cannot be null";
+        if (basePrice == 0)
+            throw "Base price cannot be zero";
+
         this.basePrice = basePrice;
     }
 
@@ -161,7 +162,7 @@ class Item {
     }
 
     setMaxItemLevel(maxLvl) {
-        if (maxLvl <= 0) throw new RuntimeException("Max item level cannot be zero or negative");
+        if (maxLvl <= 0) throw "Max item level cannot be zero or negative";
         this.maxItemLevel = maxLvl;
     }
 
