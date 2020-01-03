@@ -32,7 +32,16 @@ if (!Array.prototype.remove) {
   }
 }
 
+/**
+ * A container for all the clicker objects
+ *
+ * @author Harri Pellikka
+ */
 class World {
+	/**
+     * Constructs a new world. All the other components require an existing
+     * "world" to function. A world is a container for the whole system.
+     */
     constructor () 
     {
         this.generators = [];
@@ -48,22 +57,37 @@ class World {
 		return JSON.stringify(a) === JSON.stringify(b);
 	}
 	
+	/**
+     * Adds a new generator to this world
+     * @param generator Generator to add
+     */
     addGenerator(generator) {
         if ( generator && !this.generators.contains(generator) ) {
             this.generators.push(generator);
         }
     }
 
+	/**
+     * Returns the number of generators in this world
+     * @return The number of generators in this world
+     */
     getGeneratorCount() {
         return this.generators.length;
     }
 
+	/**
+     * Removes a generator
+     * @param generator Generator to remove
+     */
     removeGenerator(generator) {
         if (generator && this.generators.contains(generator)) {
             this.generators.remove(generator);
         }
     }
 
+	/**
+     * Removes all the generators from this world
+     */
     removeAllGenerators() {
         generators = [];
     }

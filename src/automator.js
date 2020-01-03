@@ -13,6 +13,10 @@ const Item = require('./item');
  */
 class Automator extends Item
 {
+	/**
+     * Constructs a new item
+     * @param world World this item belongs to
+     */
     constructor(world, name){
         super(world, name);
     }
