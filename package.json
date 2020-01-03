@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "description": "Library for clicker games",
   "main": "game.js",
-  "dependencies": {},
+  "dependencies": {
+    "handlebars": "^4.5.3",
+    "set-value": "^3.0.1"
+  },
   "devDependencies": {
     "jest": "^24.0.0"
   },
