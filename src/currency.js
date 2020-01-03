@@ -1,3 +1,8 @@
+/**
+ * Base class for all currencies.
+ *
+ * @author Harri Pellikka
+ */
 class Currency
 {
     constructor (build){
