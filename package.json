@@ -4,7 +4,7 @@
   "description": "Library for clicker games",
   "main": "game.js",
   "dependencies": {
-    "handlebars": "^4.7.6",
+    "handlebars": "^4.7.7",
     "minimist": "^1.2.5",
     "set-value": "^3.0.1"
   },
