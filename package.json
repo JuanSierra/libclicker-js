@@ -5,7 +5,7 @@
   "main": "game.js",
   "dependencies": {
     "handlebars": "^4.7.7",
-    "minimist": "^1.2.5",
+    "minimist": "^1.2.6",
     "set-value": "^3.0.1"
   },
   "devDependencies": {
