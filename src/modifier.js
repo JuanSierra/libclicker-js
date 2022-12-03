@@ -25,6 +25,16 @@ const Item = require('./item');
 const World = require('./world');
 const Generator = require('./generator');
 
+
+/**
+ * A base class for all the modifiers.
+ * <p>
+ * A modifier does "something" to a component (generator, automator, the
+ * world etc), for example speeds up, slows down, increases production
+ * or something similar.
+ *
+ * @author Harri Pellikka
+ */
 class WorldTarget
 {
     constructor(world){
@@ -171,6 +181,10 @@ class GeneratorTarget
     }
 }
 
+
+/**
+ * Modifier for worlds
+ */
 class WorldModifier extends Modifier{
     constructor(world) {
         super(world);
@@ -242,4 +256,4 @@ class GeneratorModifier extends Modifier
 }
 
 
-module.exports = Modifier;
+module.exports = { WorldTarget, GeneratorTarget, Modifier, WorldModifier, GeneratorModifier };

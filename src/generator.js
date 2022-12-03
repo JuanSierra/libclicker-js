@@ -1,5 +1,12 @@
 const Item = require('./item');
 
+/**
+ * A base class for all the generators.
+ * <p>
+ * Generators are used to produce resources (e.g. currencies), and
+ * can be controlled either manually or automatically by using
+ * an Automator.
+ */
 class Generator extends Item {
     constructor(build){
         super(build.mWorld, build.mName);
@@ -16,6 +23,9 @@ class Generator extends Item {
         this.modifiers = [];
     }
 
+    /**
+     * Builder class for creating new generators
+     */
 	static get Builder() {
         class Builder {
             constructor(world) {

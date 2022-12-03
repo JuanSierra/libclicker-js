@@ -2,18 +2,25 @@
   "name": "libclicker-js",
   "version": "0.1.0",
   "description": "Library for clicker games",
-  "main": "game.js",
+  "main": "rollup.config.js",
   "dependencies": {
     "handlebars": "^4.7.7",
     "minimist": "^1.2.5",
     "set-value": "^3.0.1"
   },
+  "type": "module",
   "devDependencies": {
-    "jest": "^24.0.0"
+    "jest": "^24.0.0",
+    "rollup": "^3.5.1",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "uglify-js": "^3.17.4"
   },
   "scripts": {
     "test": "jest",
-    "doc": "jsdoc -c jsdoc.conf.json"
+    "doc": "jsdoc -c jsdoc.conf.json",
+    "uglify": "uglifyjs dist/libclicker.js -o dist/libclicker.min.js",
+    "build": "rollup -c && npm run uglify"
   },
   "repository": {
     "type": "git",
