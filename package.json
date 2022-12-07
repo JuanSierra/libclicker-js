@@ -1,6 +1,6 @@
 {
   "name": "libclicker-js",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Library for clicker games",
   "main": "rollup.config.js",
   "dependencies": {
@@ -19,8 +19,9 @@
   "scripts": {
     "test": "jest",
     "doc": "jsdoc -c jsdoc.conf.json",
+    "uglify-module": "uglifyjs dist/libclicker.mjs -o dist/libclicker.min.mjs",
     "uglify": "uglifyjs dist/libclicker.js -o dist/libclicker.min.js",
-    "build": "rollup -c && npm run uglify"
+    "build": "rollup -c && npm run uglify && npm run uglify-module"
   },
   "repository": {
     "type": "git",

@@ -1,8 +1,5 @@
-const World = require('../src/world');
-const Currency = require('../src/currency');
-const Generator = require('../src/generator');
-const Automator = require('../src/automator');
-const Modifier = require('../src/modifier');
+import { World, Currency, Creator, Modifier, Automator } from "./libclicker.min.mjs";
+let Generator = Creator;
 
 let world = new World();
 let c = new Currency.Builder(world)
