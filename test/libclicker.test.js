@@ -2,7 +2,7 @@ const World = require('../src/world');
 const Currency = require('../src/currency');
 const Generator = require('../src/generator');
 const Automator = require('../src/automator');
-const Modifier = require('../src/modifier');
+const { Modifier } = require('../src/modifier');
 
 test('Testing automator', () => {
     let world = new World();
