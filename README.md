@@ -1,8 +1,6 @@
 # Libclicker
 [![Apache-2.0 License](https://img.shields.io/badge/License-Apache-2.svg)](https://choosealicense.com/licenses/apache-2.0/)
 
-sites/wondrous-starship-d64a29/deploys)
-
 _JS library for clicker games_
 
 This javascript library helps to build clicker/idle/incremental games providing a set of building pieces usually found on these kind of games.  
