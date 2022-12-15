@@ -1,23 +1,25 @@
 # Libclicker
+[![Apache-2.0 License](https://img.shields.io/badge/License-Apache-2.svg)](https://choosealicense.com/licenses/apache-2.0/)
+
+sites/wondrous-starship-d64a29/deploys)
 
 _JS library for clicker games_
 
-This javascript library helps to build clicker/idle/incremental games providing a set of building pieces usually found on these kind of games. 
-If you dont know the genre and want to try one, please visit [this complete list](https://www.reddit.com/r/incremental_games/wiki/list_of_incremental_games)
+This javascript library helps to build clicker/idle/incremental games providing a set of building pieces usually found on these kind of games.  
+If you dont know the genre and want to try one, please visit [this complete list](https://www.reddit.com/r/incremental_games/wiki/list_of_incremental_games).  
 To support all the math and balance decisions in your development [this article](https://blog.kongregate.com/the-math-of-idle-games-part-i/) is pretty useful 
 
 ## Install
 
 ### CDN
 
-Link directly to Masonry files on [unpkg](https://unpkg.com/).
+Link directly to Libclicker files on [unpkg](https://unpkg.com/).
 
 ``` html
 <script src="https://unpkg.com/libclicker/dist/libclicker.js"></script>
 <!-- or -->
 <script src="https://unpkg.com/libclicker/dist/libclicker.min.js"></script>
 ```
-## Initialize
 ## Usage
 
 ``` javascript
