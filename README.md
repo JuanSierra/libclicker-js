@@ -40,8 +40,6 @@ let goldMine = new Creator.Builder(world)
 // Advance the world by 30 seconds to make the automator work
 world.update(30.0);
 ``` 
-## Documentation
-
 ## Roadmap
 * Documentation [X]
 * Example Game []   
