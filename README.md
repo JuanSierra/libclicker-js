@@ -1,5 +1,5 @@
 # Libclicker
-[![tests](https://github.com/JuanSierra/libclicker-js/actions/workflows/tests.yml/badge.svg)]([https://github.com/cytoscape/cytoscape.js/actions/workflows/tests.yml](https://github.com/JuanSierra/libclicker-js/actions/workflows/tests.yml)
+[![tests](https://github.com/JuanSierra/libclicker-js/actions/workflows/tests.yml/badge.svg)](https://github.com/JuanSierra/libclicker-js/actions/workflows/tests.yml)
 [![Apache-2.0 License](https://img.shields.io/badge/License-Apache-2.svg)](https://choosealicense.com/licenses/apache-2.0/)
 
 _JS library for clicker games_
