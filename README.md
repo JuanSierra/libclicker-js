@@ -1,4 +1,6 @@
 # Libclicker
+[![tests](https://github.com/JuanSierra/libclicker-js/actions/workflows/tests.yml/badge.svg)](https://github.com/JuanSierra/libclicker-js/actions/workflows/tests.yml)
+[![npm](https://img.shields.io/npm/v/libclicker.svg)](https://www.npmjs.com/package/libclicker)
 [![Apache-2.0 License](https://img.shields.io/badge/License-Apache-2.svg)](https://choosealicense.com/licenses/apache-2.0/)
 
 _JS library for clicker games_
