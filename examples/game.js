@@ -88,29 +88,66 @@ function render(){
 	data.energyLevel = gen_energy_button.itemLevel + 1;
 }
 
-t`
-<div style="display:flex; flex-direction: column;">
-<div>
-  <span>
-   ${() => data.energy} 
-  </span>
+function indicators(){
 
-  <button @click="${addEnergy}">
-    energy
-  </button>
-  
-  <button disabled="${canUpgradeEnergy}">
-    auto: lvl ${() => data.energyLevel}
-  </button>
-</div>
-<div>
-  <span>
-   ${() => data.chips} 
-  </span>
-  
-	<button @click="${addChip}">
-    chips
-  </button>
-</div>
+  return t`
+    <div class="column col-5">
+      <div class="text-center">
+        <span>⚡</span>
+        <span>Qty: ${() => data.energy}</span>
+      </div>
+    </div>
+    <div class="divider-vert text-center column col-2"></div>
+    <div class="column col-5">
+      <div class="text-center">
+        <span>💵</span>
+        <span>Qty: 13</span>
+      </div>
+    </div>
+  `
+}
+
+t`
+<div class="container">
+  <div class="columns">
+  	${() => indicators(data.energyLevel)}
+     <div class="column col-10 flex-centered">
+       <button class="btn btn-block p-centered">
+        press
+      </button>
+     </div>
+      <div class="column col-2">
+        <label class="form-checkbox">
+          <input type="checkbox">
+          <i class="form-icon"></i> auto
+        </label>
+        <button class="btn btn-sm btn-block">
+            lvl 2
+        </button>
+      </div>
+    <div class="column col-12">
+      <span>
+       ${() => data.energy} 
+      </span>
+
+      <button @click="${addEnergy}">
+        energy
+      </button>
+
+      <button disabled="${canUpgradeEnergy}">
+        auto: lvl ${() => data.energyLevel}
+      </button>
+    </div>
+  <div class="column col-12">
+    <span>
+     ${() => data.chips} 
+    </span>
+
+    <button @click="${addChip}">
+      chips
+    </button>
+  </div>
+</div>  
+<div class="divider"></div>
 </div>  
 `($('#app'));
