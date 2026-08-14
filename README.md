@@ -7,7 +7,7 @@ _JS library for clicker games_
 
 This javascript library helps to build clicker/idle/incremental games providing a set of building pieces usually found on these kind of games.  
 If you dont know the genre and want to try one, please visit [this complete list](https://www.reddit.com/r/incremental_games/wiki/list_of_incremental_games).  
-To support all the math and balance decisions in your development [this article](https://blog.kongregate.com/the-math-of-idle-games-part-i/) is pretty useful 
+To support all the math and balance decisions in your development [this article](https://kongregatedev.ghost.io/the-math-of-idle-games-part-i/) is pretty useful 
 
 ## Install
 
