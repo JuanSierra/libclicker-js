@@ -1,6 +1,6 @@
 {
   "name": "libclicker",
-  "version": "0.3.2",
+  "version": "0.3.1",
   "description": "JS library for clicker games",
   "keywords": [
     "games",
@@ -12,16 +12,16 @@
   "main": "dist/libclicker.js",
   "dependencies": {
     "handlebars": "^4.7.7",
-    "minimist": "^1.2.5",
-    "set-value": "^3.0.1"
+    "minimist": "^1.2.8",
+    "set-value": "^4.1.0"
   },
   "type": "module",
   "devDependencies": {
-    "jest": "^24.0.0",
-    "rollup": "^3.5.1",
+    "jest": "^30.4.2",
+    "rollup": "^4.62.4",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
-    "uglify-js": "^3.17.4"
+    "uglify-js": "^3.19.3"
   },
   "scripts": {
     "test": "jest",
