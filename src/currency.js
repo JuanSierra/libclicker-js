@@ -1,3 +1,5 @@
+const BigIntUtils = require('./bigint-utils');
+
 /**
  * Base class for all currencies.
  *
@@ -8,7 +10,13 @@ class Currency
     constructor (build){
         this.name = build.mName;
         this.world = build.world;
-        this.value = 0;
+        this._useBigInt = build._useBigInt || false;
+        
+        if (this._useBigInt) {
+            this.value = BigInt(0);
+        } else {
+            this.value = 0;
+        }
     }
 
     static get Builder() {
@@ -16,10 +24,16 @@ class Currency
             constructor(world) {
                 this.mName = "Gold";
                 this.world = world;
+                this._useBigInt = false;
             }
 
             name(name) {
                 this.mName = name;
+                return this;
+            }
+
+            useBigInt() {
+                this._useBigInt = true;
                 return this;
             }
 
@@ -36,19 +50,35 @@ class Currency
     }
 
     add(amount) {
-        this.value = this.value + amount;
+        if (this._useBigInt) {
+            this.value = BigIntUtils.add(this.value, amount);
+        } else {
+            this.value = this.value + amount;
+        }
     }
 
     sub(amount) {
-        this.value = this.value - amount;
+        if (this._useBigInt) {
+            this.value = BigIntUtils.sub(this.value, amount);
+        } else {
+            this.value = this.value - amount;
+        }
     }
 
     multiply(multiplier) {
-        this.value = this.value * multiplier;
+        if (this._useBigInt) {
+            this.value = BigIntUtils.mul(this.value, multiplier);
+        } else {
+            this.value = this.value * multiplier;
+        }
     }
 
     set(newValue) {
-        this.value = newValue;
+        if (this._useBigInt) {
+            this.value = BigIntUtils.from(newValue);
+        } else {
+            this.value = newValue;
+        }
     }
 
 	equals(a,b) {

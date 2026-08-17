@@ -19,13 +19,14 @@ class Automator extends Item
      */
     constructor(world, name){
         super(world, name);
+        this._useBigInt = false;
     }
 
     static get Builder() {
         class Builder {
             /**
              * Constructs a new automator builder
-             * @param world World the automator belongs to
+             * @param world the automator belongs to
              */
             constructor(world){
                 this.mWorld = world;
@@ -37,10 +38,11 @@ class Automator extends Item
                 this.mBasePrice = 999999999;//BigInteger.ONE;
                 this.mPriceMultiplier = 1.1;
                 this.mTickRateMultiplier = 1.08;
+                this._useBigInt = false;
             }
 
-            basePrice(name) {
-                this.basePrice = name;
+            basePrice(price) {
+                this.mBasePrice = price;
                 
                 return this;
             }
@@ -64,7 +66,7 @@ class Automator extends Item
              * @return This builder for chaining
              */
             automate(generator) {
-                this.generator  = generator;
+                this.mGenerator = generator;
 
                 return this;
             }
@@ -76,7 +78,7 @@ class Automator extends Item
              * @return This builder for chaining
              */
             name(name) {
-                this.name = name;
+                this.mName = name;
 
                 return this;
             }
@@ -89,8 +91,13 @@ class Automator extends Item
              * @return This builder for chaining
              */
             every(seconds) {
-                this.tickRate = seconds;
+                this.mTickRate = seconds;
 
+                return this;
+            }
+            
+            useBigInt() {
+                this._useBigInt = true;
                 return this;
             }
             
@@ -100,16 +107,17 @@ class Automator extends Item
              */
             build() {
                 //if (generator == null) throw new IllegalStateException("Generator cannot be null");
-                var a = new Automator(this.mWorld, this.name);
-                a.generator = this.generator;
+                var a = new Automator(this.mWorld, this.mName);
+                a.generator = this.mGenerator;
                 a.enabled = this.mEnabled;
-                a.basePrice = this.basePrice;
+                a.basePrice = this.mBasePrice;
                 a._priceMultiplier = this._priceMultiplier;
                 //console.log('mult '+ this._tickRateMultiplier)
                 a.multiplier = this._tickRateMultiplier;
-                a.tickRate = this.tickRate;
+                a.tickRate = this.mTickRate;
                 a.tickTimer = this.mTickTimer;
-                a.actualTickRate = this.actualTickRate;
+                a.actualTickRate = this.mTickRate;
+                a._useBigInt = this._useBigInt;
                 
                 this.mWorld.addAutomator(a);
                 
@@ -143,7 +151,7 @@ class Automator extends Item
 
 	//this.super_upgrade = this.upgrade;
     upgrade() {
-        super.upgrade(); //To change body of generated methods, choose Tools | Templates.
+        super.upgrade();
         this.actualTickRate = this.getFinalTickRate();
     }
 

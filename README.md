@@ -42,10 +42,31 @@ let goldMine = new Creator.Builder(world)
 // Advance the world by 30 seconds to make the automator work
 world.update(30.0);
 ``` 
+
+### BigInt Support
+
+For games with very large numbers (levels beyond ~120), enable optional BigInt support to avoid precision loss:
+
+``` javascript
+let gold = new Currency.Builder(world)
+    .name("Gold")
+    .useBigInt()
+    .build();
+
+let goldMine = new Generator.Builder(world)
+    .generate(gold)
+    .baseAmount(1000000000000000)
+    .multiplier(2)
+    .useBigInt()
+    .build();
+```
+
+When enabled, all numeric values are stored as JavaScript `bigint`, preserving exact precision for values exceeding `Number.MAX_SAFE_INTEGER`. The feature is opt-in — without `.useBigInt()`, behavior is identical to previous versions.
+
 ## Roadmap
 * Documentation [X]
 * Example Game []   
-* BigInt support []
+* BigInt support [X]
 
 ## Credits
 A javascript port based on the good [libclicker2](https://github.com/manabreak/libclicker2) by @manabreak

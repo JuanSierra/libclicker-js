@@ -1,4 +1,5 @@
 const PurchaseResult = require('./PurchaseResult');
+const BigIntUtils = require('./bigint-utils');
 
 /**
  * Base class for all the purchasable "items".
@@ -97,46 +98,11 @@ class Item {
     }
 
     setBasePrice(basePrice) {
-        this.basePrice = basePrice;
-    }
-
-    getPrice() {
-        var tmp = this.basePrice;
-        tmp = tmp * Math.pow(this.priceMultiplier, this.itemLevel);
-        return tmp;
-    }
-
-    buyWith(currency) {
-        //if (currency == null) throw new IllegalArgumentException("Currency cannot be null");
-        if (this.itemLevel >= this.maxItemLevel)
-            return PurchaseResult.MAX_LEVEL_REACHED;
-
-        var price = this.getPrice();
-        var result = currency.value - price;
-		
-        if (result < 0) {
-            return PurchaseResult.INSUFFICIENT_FUNDS;
-        }
-        currency -= price;//currency.sub(price);
-        this.upgrade();
-        return PurchaseResult.OK;
-    }
-
-    /**
-     * Sets the base price of this item
-     *
-     * @param basePrice New base price for this item
-     */
-    setBasePrice(basePrice) {
         if (basePrice == null) throw "Base price cannot be null";
         if (basePrice == 0)
             throw "Base price cannot be zero";
 
         this.basePrice = basePrice;
-    }
-
-    setBasePrice(basePrice) {
-        this.basePrice = basePrice;//new BigInteger("" + basePrice);
     }
 
     /**
@@ -188,6 +154,45 @@ class Item {
 
     maximize() {
         this.itemLevel = this.maxItemLevel;
+    }
+
+    getPrice() {
+        var tmp;
+        if (typeof this.basePrice === 'bigint') {
+            var priceMultiplierFloat = Number(this.basePrice) * Math.pow(this.priceMultiplier, this.itemLevel);
+            return BigInt(Math.floor(priceMultiplierFloat));
+        }
+        tmp = this.basePrice;
+        tmp = tmp * Math.pow(this.priceMultiplier, this.itemLevel);
+        return tmp;
+    }
+
+    buyWith(currency) {
+        //if (currency == null) throw new IllegalArgumentException("Currency cannot be null");
+        if (this.itemLevel >= this.maxItemLevel)
+            return PurchaseResult.MAX_LEVEL_REACHED;
+
+        var price = this.getPrice();
+        var result;
+        
+        if (typeof currency.value === 'bigint') {
+            result = currency.value - BigIntUtils.from(price);
+        } else {
+            result = currency.value - price;
+        }
+		
+        if (result < 0) {
+            return PurchaseResult.INSUFFICIENT_FUNDS;
+        }
+        
+        if (typeof currency.value === 'bigint') {
+            currency.value = currency.value - BigIntUtils.from(price);
+        } else {
+            currency.value -= price;
+        }
+        
+        this.upgrade();
+        return PurchaseResult.OK;
     }
 }
 
