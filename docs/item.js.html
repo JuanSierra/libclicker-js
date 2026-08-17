@@ -27,133 +27,118 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>const PurchaseResult = require('./PurchaseResult');
+const BigIntUtils = require('./bigint-utils');
 
 /**
- * Base class for all the purchasable "items".
- * 
+ * Base class for all purchasable items.
+ * Items have a level, price, and can be upgraded/downgraded.
+ * Supports optional BigInt arithmetic via the basePrice property.
+ *
  * @author Harri Pellikka
+ * @class
  */
 class Item {
     /**
-     * Constructs a new item
-     * @param world World this item belongs to
+     * Constructs a new item.
+     * @param {World} world - World this item belongs to
+     * @param {string} [name="Nameless Item"] - Name of this item
      */
     constructor (world, name = "Nameless Item") {
         /**
          * World this item belongs to
+         * @type {World}
          */
         this.world = world;
 
         /**
          * Modifiers applied to this item
+         * @type {Array}
          */
         this.modifiers = [];
 
         /**
-         * The base price of the item (i.e. the price of the first level of this item)
+         * The base price of the item (i.e. the price of the first level).
+         * When using BigInt mode, this is stored as a bigint.
+         * @type {number|bigint}
          */
-        this.basePrice = 1;//BigInteger.ONE;
+        this.basePrice = 1;
 
         /**
          * Name of this item
+         * @type {string}
          */
         this.name = name;
 
         /**
          * Description text for this item
+         * @type {string}
          */
         this.description = "No description.";
 
         /**
          * Current level of this item
+         * @type {number}
          */
         this.itemLevel = 0;
 
         /**
-         * Max. item level
+         * Maximum item level
+         * @type {number}
          */
-        this.maxItemLevel = 99999999;//Long.MAX_VALUE;
+        this.maxItemLevel = 99999999;
 
         /**
-         * Price multiplier per level. This is used in the price formula
-         * like this: price = (base price) * (price multiplier) ^ (item level)
+         * Price multiplier per level. Used in the formula:
+         * price = basePrice * (priceMultiplier ^ itemLevel)
+         * @type {number}
          */
         this.priceMultiplier = 1.145;
     }
 
     /**
-     * Retrieves the name of this item
-     *
-     * @return {string} Name of this item
+     * Retrieves the name of this item.
+     * @returns {string} Name of this item
      */
     getName() {
         return this.name;
     }
 
     /**
-     * Sets the name of this item
-     *
-     * @param name New name for this item
+     * Sets the name of this item.
+     * @param {string} name - New name for this item
      */
     setName(name) {
-        //if (name == null || name.length() == 0)
-            //throw new RuntimeException("Item name cannot be null or empty");
         this.name = name;
     }
 
     /**
-     * This method logs the given message to the browser console.
-     *
-     * @public
-     * @method
+     * Retrieves the description of this item.
+     * @returns {string} Description text
      */
     getDescription() {
         return this.description;
     }
 
+    /**
+     * Sets the description of this item.
+     * @param {string} description - New description text
+     */
     setDescription(description) {
         this.description = description;
     }
 
     /**
-     * Retrieves the base price of this item
-     *
-     * @return Base price of this item
+     * Retrieves the base price of this item.
+     * @returns {number|bigint} Base price (number or bigint depending on configuration)
      */
     getBasePrice() {
         return this.basePrice;
     }
 
-    setBasePrice(basePrice) {
-        this.basePrice = basePrice;
-    }
-
-    getPrice() {
-        var tmp = this.basePrice;
-        tmp = tmp * Math.pow(this.priceMultiplier, this.itemLevel);
-        return tmp;
-    }
-
-    buyWith(currency) {
-        //if (currency == null) throw new IllegalArgumentException("Currency cannot be null");
-        if (this.itemLevel >= this.maxItemLevel)
-            return PurchaseResult.MAX_LEVEL_REACHED;
-
-        var price = this.getPrice();
-        var result = currency.value - price;
-		
-        if (result &lt; 0) {
-            return PurchaseResult.INSUFFICIENT_FUNDS;
-        }
-        currency -= price;//currency.sub(price);
-        this.upgrade();
-        return PurchaseResult.OK;
-    }
-
     /**
-     * Sets the base price of this item
-     *
-     * @param basePrice New base price for this item
+     * Sets the base price of this item.
+     * @param {number} basePrice - New base price (must not be null or zero)
+     * @throws {string} If basePrice is null or zero
      */
     setBasePrice(basePrice) {
         if (basePrice == null) throw "Base price cannot be null";
@@ -163,63 +148,133 @@ class Item {
         this.basePrice = basePrice;
     }
 
-    setBasePrice(basePrice) {
-        this.basePrice = basePrice;//new BigInteger("" + basePrice);
-    }
-
     /**
-     * Retrieves the price multiplier
-     *
-     * @return Price multiplier
+     * Retrieves the price multiplier.
+     * @returns {number} Price multiplier
      */
     getPriceMultiplier() {
         return this.priceMultiplier;
     }
 
     /**
-     * Sets the price multiplier of this item
-     *
-     * @param multiplier Price multiplier
+     * Sets the price multiplier of this item.
+     * @param {number} multiplier - Price multiplier value
      */
     setPriceMultiplier(multiplier) {
         this.priceMultiplier = multiplier;
     }
 
+    /**
+     * Retrieves the maximum item level.
+     * @returns {number} Maximum item level
+     */
     getMaxItemLevel() {
         return this.maxItemLevel;
     }
 
+    /**
+     * Sets the maximum item level.
+     * @param {number} maxLvl - Maximum level (must be positive)
+     * @throws {string} If maxLvl is zero or negative
+     */
     setMaxItemLevel(maxLvl) {
         if (maxLvl &lt;= 0) throw "Max item level cannot be zero or negative";
         this.maxItemLevel = maxLvl;
     }
 
+    /**
+     * Retrieves the current item level.
+     * @returns {number} Current item level
+     */
     getItemLevel() {
         return this.itemLevel;
     }
 
+    /**
+     * Sets the item level, clamping between 0 and maxItemLevel.
+     * @param {number} lvl - Desired level
+     */
     setItemLevel(lvl) {
         this.itemLevel = lvl &lt; 0 ? 0 : lvl > this.maxItemLevel ? this.maxItemLevel : lvl;
     }
 
+    /**
+     * Upgrades this item by one level, if not at maximum level.
+     */
     upgrade() {
         if (this.itemLevel &lt; this.maxItemLevel) {
             this.itemLevel++;
         }
     }
 
+    /**
+     * Downgrades this item by one level, if above level 0.
+     */
     downgrade() {
         if (this.itemLevel > 0) {
             this.itemLevel--;
         }
     }
 
+    /**
+     * Sets this item's level to its maximum.
+     */
     maximize() {
         this.itemLevel = this.maxItemLevel;
     }
+
+    /**
+     * Calculates the current price of this item based on its level.
+     * Formula: price = basePrice * (priceMultiplier ^ itemLevel)
+     * @returns {number|bigint} Current price (bigint if basePrice is bigint)
+     */
+    getPrice() {
+        var tmp;
+        if (typeof this.basePrice === 'bigint') {
+            var priceMultiplierFloat = Number(this.basePrice) * Math.pow(this.priceMultiplier, this.itemLevel);
+            return BigInt(Math.floor(priceMultiplierFloat));
+        }
+        tmp = this.basePrice;
+        tmp = tmp * Math.pow(this.priceMultiplier, this.itemLevel);
+        return tmp;
+    }
+
+    /**
+     * Attempts to purchase this item using the given currency.
+     * If successful, upgrades the item and deducts the price from the currency.
+     * @param {Currency} currency - Currency to pay with
+     * @returns {string} PurchaseResult indicating outcome (OK, INSUFFICIENT_FUNDS, MAX_LEVEL_REACHED)
+     */
+    buyWith(currency) {
+        if (this.itemLevel >= this.maxItemLevel)
+            return PurchaseResult.MAX_LEVEL_REACHED;
+
+        var price = this.getPrice();
+        var result;
+        
+        if (typeof currency.value === 'bigint') {
+            result = currency.value - BigIntUtils.from(price);
+        } else {
+            result = currency.value - price;
+        }
+		
+        if (result &lt; 0) {
+            return PurchaseResult.INSUFFICIENT_FUNDS;
+        }
+        
+        if (typeof currency.value === 'bigint') {
+            currency.value = currency.value - BigIntUtils.from(price);
+        } else {
+            currency.value -= price;
+        }
+        
+        this.upgrade();
+        return PurchaseResult.OK;
+    }
 }
 
-module.exports = Item;</code></pre>
+module.exports = Item;
+</code></pre>
         </article>
     </section>
 
@@ -229,13 +284,13 @@ module.exports = Item;</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Automator.html">Automator</a></li><li><a href="Builder.html">Builder</a></li><li><a href="Currency.html">Currency</a></li><li><a href="Generator.html">Generator</a></li><li><a href="GeneratorModifier.html">GeneratorModifier</a></li><li><a href="GeneratorTarget.html">GeneratorTarget</a></li><li><a href="Item.html">Item</a></li><li><a href="Modifier.html">Modifier</a></li><li><a href="World.html">World</a></li><li><a href="WorldModifier.html">WorldModifier</a></li><li><a href="WorldTarget.html">WorldTarget</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-bigint-utils.html">bigint-utils</a></li></ul><h3>Classes</h3><ul><li><a href="Automator.html">Automator</a></li><li><a href="Automator.Builder.html">Builder</a></li><li><a href="Builder.html">Builder</a></li><li><a href="Currency.html">Currency</a></li><li><a href="Currency.Builder.html">Builder</a></li><li><a href="Generator.html">Generator</a></li><li><a href="Generator.Builder.html">Builder</a></li><li><a href="GeneratorModifier.html">GeneratorModifier</a></li><li><a href="GeneratorTarget.html">GeneratorTarget</a></li><li><a href="Item.html">Item</a></li><li><a href="Modifier.html">Modifier</a></li><li><a href="World.html">World</a></li><li><a href="WorldModifier.html">WorldModifier</a></li><li><a href="WorldTarget.html">WorldTarget</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Thu Dec 15 2022 19:18:29 GMT+0000 (Hora padrão da Europa Ocidental)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Mon Aug 17 2026 19:39:39 GMT+0100 (Hora de verão da Europa Ocidental)
 </footer>
 
 <script> prettyPrint(); </script>

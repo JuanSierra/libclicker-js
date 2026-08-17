@@ -26,31 +26,79 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/**
+            <pre class="prettyprint source linenums"><code>const BigIntUtils = require('./bigint-utils');
+
+/**
  * Base class for all currencies.
+ * Stores the current value which can be either a number or BigInt depending on configuration.
  *
  * @author Harri Pellikka
+ * @class
  */
 class Currency
 {
+    /**
+     * Constructs a new currency from a builder.
+     * @param {Object} build - The builder object containing configuration
+     * @param {string} build.mName - Name of the currency
+     * @param {World} build.world - The world this currency belongs to
+     * @param {boolean} build._useBigInt - Whether to use BigInt for value storage
+     */
     constructor (build){
         this.name = build.mName;
         this.world = build.world;
-        this.value = 0;
+        this._useBigInt = build._useBigInt || false;
+        
+        if (this._useBigInt) {
+            /** @type {bigint} */
+            this.value = BigInt(0);
+        } else {
+            /** @type {number} */
+            this.value = 0;
+        }
     }
 
+    /**
+     * Builder class for creating new currencies.
+     * @class
+     */
     static get Builder() {
         class Builder {
+            /**
+             * Constructs a new currency builder.
+             * @param {World} world - The world the currency belongs to
+             */
             constructor(world) {
                 this.mName = "Gold";
                 this.world = world;
+                this._useBigInt = false;
             }
 
+            /**
+             * Sets the name for this currency.
+             * @param {string} name - Currency name
+             * @returns {Builder} This builder for chaining
+             */
             name(name) {
                 this.mName = name;
                 return this;
             }
 
+            /**
+             * Enables BigInt mode for this currency.
+             * When enabled, the currency value is stored as JavaScript BigInt,
+             * allowing exact arithmetic for values beyond Number.MAX_SAFE_INTEGER (~9×10^15).
+             * @returns {Builder} This builder for chaining
+             */
+            useBigInt() {
+                this._useBigInt = true;
+                return this;
+            }
+
+            /**
+             * Builds and returns a new Currency instance.
+             * @returns {Currency} The constructed currency
+             */
             build() {
                 return new Currency(this);
             }
@@ -59,32 +107,76 @@ class Currency
         return Builder;
     }
 	
+    /**
+     * Returns the currency value as a string representation.
+     * Useful for display purposes since BigInt cannot be directly interpolated in strings.
+     * @returns {string} String representation of the currency value
+     */
     getAmountAsString() {
         return this.value.toString();
     }
 
+    /**
+     * Adds an amount to the currency value.
+     * @param {number|string|bigint} amount - Amount to add
+     */
     add(amount) {
-        this.value = this.value + amount;
+        if (this._useBigInt) {
+            this.value = BigIntUtils.add(this.value, amount);
+        } else {
+            this.value = this.value + amount;
+        }
     }
 
+    /**
+     * Subtracts an amount from the currency value.
+     * @param {number|string|bigint} amount - Amount to subtract
+     */
     sub(amount) {
-        this.value = this.value - amount;
+        if (this._useBigInt) {
+            this.value = BigIntUtils.sub(this.value, amount);
+        } else {
+            this.value = this.value - amount;
+        }
     }
 
+    /**
+     * Multiplies the currency value by a multiplier.
+     * @param {number|string|bigint} multiplier - Multiplier value
+     */
     multiply(multiplier) {
-        this.value = this.value * multiplier;
+        if (this._useBigInt) {
+            this.value = BigIntUtils.mul(this.value, multiplier);
+        } else {
+            this.value = this.value * multiplier;
+        }
     }
 
+    /**
+     * Sets the currency value to a new value.
+     * @param {number|string|bigint} newValue - New value to set
+     */
     set(newValue) {
-        this.value = newValue;
+        if (this._useBigInt) {
+            this.value = BigIntUtils.from(newValue);
+        } else {
+            this.value = newValue;
+        }
     }
 
+	/**
+     * Compares two objects for deep equality via JSON serialization.
+     * @param {*} a - First object
+     * @param {*} b - Second object
+     * @returns {boolean} true if both objects have identical JSON representations
+     */
 	equals(a,b) {
 		return JSON.stringify(a) === JSON.stringify(b);
 	}
 }
 
-module.exports = Currency</code></pre>
+module.exports = Currency
+</code></pre>
         </article>
     </section>
 
@@ -94,13 +186,13 @@ module.exports = Currency</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Automator.html">Automator</a></li><li><a href="Builder.html">Builder</a></li><li><a href="Currency.html">Currency</a></li><li><a href="Generator.html">Generator</a></li><li><a href="GeneratorModifier.html">GeneratorModifier</a></li><li><a href="GeneratorTarget.html">GeneratorTarget</a></li><li><a href="Item.html">Item</a></li><li><a href="Modifier.html">Modifier</a></li><li><a href="World.html">World</a></li><li><a href="WorldModifier.html">WorldModifier</a></li><li><a href="WorldTarget.html">WorldTarget</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-bigint-utils.html">bigint-utils</a></li></ul><h3>Classes</h3><ul><li><a href="Automator.html">Automator</a></li><li><a href="Automator.Builder.html">Builder</a></li><li><a href="Builder.html">Builder</a></li><li><a href="Currency.html">Currency</a></li><li><a href="Currency.Builder.html">Builder</a></li><li><a href="Generator.html">Generator</a></li><li><a href="Generator.Builder.html">Builder</a></li><li><a href="GeneratorModifier.html">GeneratorModifier</a></li><li><a href="GeneratorTarget.html">GeneratorTarget</a></li><li><a href="Item.html">Item</a></li><li><a href="Modifier.html">Modifier</a></li><li><a href="World.html">World</a></li><li><a href="WorldModifier.html">WorldModifier</a></li><li><a href="WorldTarget.html">WorldTarget</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Thu Dec 15 2022 19:18:29 GMT+0000 (Hora padrão da Europa Ocidental)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Mon Aug 17 2026 19:39:39 GMT+0100 (Hora de verão da Europa Ocidental)
 </footer>
 
 <script> prettyPrint(); </script>

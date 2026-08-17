@@ -2,13 +2,20 @@ const Item = require('./item');
 const BigIntUtils = require('./bigint-utils');
 
 /**
- * A base class for all the generators.
- * <p>
- * Generators are used to produce resources (e.g. currencies), and
- * can be controlled either manually or automatically by using
- * an Automator.
+ * A base class for all generators.
+ * Generators produce resources (currencies) and can be controlled
+ * manually or automatically via Automators.
+ * Supports optional BigInt arithmetic for high-precision production at high levels.
+ *
+ * @author Harri Pellikka
+ * @extends Item
+ * @class
  */
 class Generator extends Item {
+    /**
+     * Constructs a new generator from a builder.
+     * @param {Object} build - The builder object containing configuration
+     */
     constructor(build){
         super(build.mWorld, build.mName);
 
@@ -32,11 +39,33 @@ class Generator extends Item {
         }
 
         if (this._useBigInt) {
+            /**
+             * Base amount of resources generated per cycle at level 1.
+             * Stored as bigint when BigInt mode is enabled.
+             * @type {bigint}
+             */
             this.baseAmount = BigIntUtils.from(build.mBaseAmount);
+            /**
+             * Accumulated fractional remainder for overflow-based generation.
+             * Only used when useRemainder is true and BigInt mode is enabled.
+             * @type {bigint}
+             */
             this.remainder = BigInt(0);
+            /**
+             * Floating-point helper for tracking fractional remainders in BigInt mode.
+             * @type {number}
+             */
             this._remainderFloat = 0;
         } else {
+            /**
+             * Base amount of resources generated per cycle at level 1.
+             * @type {number}
+             */
             this.baseAmount = build.mBaseAmount;
+            /**
+             * Accumulated fractional remainder for overflow-based generation.
+             * @type {number}
+             */
             this.remainder = 0;
             this._remainderFloat = 0;
         }
@@ -45,10 +74,15 @@ class Generator extends Item {
     }
 
     /**
-     * Builder class for creating new generators
+     * Builder class for creating new generators.
+     * @class
      */
 	static get Builder() {
         class Builder {
+            /**
+             * Constructs a new generator builder.
+             * @param {World} world - The world the generator belongs to
+             */
             constructor(world) {
                 this.mWorld = world;
                 this.mName = "Nameless generator";
@@ -57,7 +91,7 @@ class Generator extends Item {
                 this.mBaseAmount = 1;
                 this.mAmountMultiplier = 1.1;
                 this.mMaxLevel = 999999999;
-                this.mBasePrice = 999999999;//BigInteger.ONE;
+                this.mBasePrice = 999999999;
                 this.mPriceMultiplier = 1.1;
                 this.mProbability = 1.0;
                 this.mProbabilitySet = false;
@@ -69,11 +103,9 @@ class Generator extends Item {
 
             /**
              * Sets the cooldown of this generator (in seconds).
-             * This is the minimum time between processing this
-             * generator.
-             *
-             * @param cooldown in seconds
-             * @return This builder for chaining
+             * This is the minimum time between processing this generator.
+             * @param {number} cooldown - Cooldown duration in seconds
+             * @returns {Builder} This builder for chaining
              */
             cooldown(cooldown) {
                 this.mCooldown = cooldown;
@@ -81,10 +113,9 @@ class Generator extends Item {
             }
 
             /**
-             * Store remainder of resources and generate an extra
-             * when the remainder "overflows"
-             *
-             * @return This builder for chaining
+             * Enables remainder storage: fractional parts of generated amounts
+             * are accumulated and trigger an extra unit when they overflow to 1.0.
+             * @returns {Builder} This builder for chaining
              */
             useRemainder() {
                 this.mUseRemainder = true;
@@ -92,9 +123,8 @@ class Generator extends Item {
             }
 
             /**
-             * Discard remainder of resources when generating.
-             *
-             * @return This builder for chaining
+             * Disables remainder storage: fractional parts are discarded each cycle.
+             * @returns {Builder} This builder for chaining
              */
             discardRemainder() {
                 this.mUseRemainder = false;
@@ -102,10 +132,9 @@ class Generator extends Item {
             }
 
             /**
-             * Sets the name for the generator
-             *
-             * @param name Name for the generator
-             * @return This builder for chaining
+             * Sets the name for the generator.
+             * @param {string} name - Name for the generator
+             * @returns {Builder} This builder for chaining
              */
             name(name) {
                 this.mName = name;
@@ -113,11 +142,10 @@ class Generator extends Item {
             }
 
             /**
-             * Sets the multiplier for resource generation. This multiplier
-             * is used in the formula (amount) = (base amount) * (multiplier) ^ (level)
-             *
-             * @param multiplier Amount generation multiplier per level
-             * @return This builder for chaining
+             * Sets the multiplier for resource generation per level.
+             * Formula: amount = baseAmount * (multiplier ^ (level - 1))
+             * @param {number} multiplier - Amount generation multiplier per level
+             * @returns {Builder} This builder for chaining
              */
             multiplier(multiplier) {
                 this.mAmountMultiplier = multiplier;
@@ -125,26 +153,10 @@ class Generator extends Item {
             }
 
             /**
-             * Sets the maximum allowed level for this generator. The max level must
-             * be greated than zero.
-             *
-             * @param maxLevel Maximum allowed level for this generator
-             * @return This builder for chaining
-             */
-            /*this.maxLevel = function(maxLevel) {
-                //if (maxLevel <= 0)
-                //    throw new IllegalArgumentException("Max level must be greater than 0");
-                self.maxLevel = maxLevel;
-                return this;
-            }*/
-
-            /**
-             * Sets the base amount of resources generated by this generator.
-             * This is the amount the generator generates at level 1 and is used
-             * as the base for the higher levels.
-             *
-             * @param amount Base amount of resources generated at level 1
-             * @return This builder for chaining
+             * Sets the base amount of resources generated by this generator at level 1.
+             * @param {number} amount - Base amount of resources
+             * @returns {Builder} This builder for chaining
+             * @throws {string} If amount is null
              */
             baseAmount(amount) {
                 if (amount == null) throw "Base amount cannot be null";
@@ -153,45 +165,52 @@ class Generator extends Item {
             }
 
             /**
-             * Sets the currency that should be generated by the generator.
-             *
-             * @param resource Resource to generate
-             * @return This builder for chaining
-             * @throws IllegalArgumentException Thrown if the currency is null
+             * Sets the currency that this generator produces.
+             * @param {Currency} resource - Currency to generate
+             * @returns {Builder} This builder for chaining
+             * @throws {string} If resource is null
              */
-            generate(resource) { //throws IllegalArgumentException {
+            generate(resource) {
                 if (resource == null) throw "Currency cannot be null";
                 this.mCurrency = resource;
                 return this;
             }
 
             /**
-             * Sets a callback for the generator to be called when the generator
-             * has finished its processing cycle (i.e. has generated something).
-             *
-             * @param callback Callback to call after generating something
-             * @return This builder for chaining
+             * Sets a callback invoked after each processing cycle.
+             * @param {Function} callback - Callback function
+             * @returns {Builder} This builder for chaining
              */
             callback(callback) {
                 this.onProcessed = callback;
                 return this;
             }
 
+            /**
+             * Sets the base price of this generator.
+             * @param {number} price - Base price
+             * @returns {Builder} This builder for chaining
+             */
             price(price) {
                 this.basePrice = price;
                 return this;
             }
 
+            /**
+             * Sets the price multiplier per level.
+             * @param {number} multiplier - Price multiplier
+             * @returns {Builder} This builder for chaining
+             */
             priceMultiplier(multiplier) {
                 this.priceMultiplier = multiplier;
                 return this;
             }
 
             /**
-             * Set a probability for this generator to "work" when it's processed
-             *
-             * @param probability Probability percentage (between 0.0 and 1.0)
-             * @return This builder for chaining
+             * Sets a probability for this generator to work when processed.
+             * @param {number} probability - Probability between 0.0 and 1.0
+             * @returns {Builder} This builder for chaining
+             * @throws {string} If probability is outside [0.0, 1.0]
              */
             probability(probability) {
                 if (probability < 0 || probability > 1.0)
@@ -203,11 +222,22 @@ class Generator extends Item {
                 return this;
             }
 
+            /**
+             * Enables BigInt mode for this generator.
+             * When enabled, baseAmount, remainder, and generated amounts are stored as JavaScript BigInt,
+             * providing exact arithmetic for values beyond Number.MAX_SAFE_INTEGER (~9×10^15).
+             * Uses scaled integer arithmetic internally to handle fractional multipliers (e.g., 1.25).
+             * @returns {Builder} This builder for chaining
+             */
             useBigInt() {
                 this._useBigInt = true;
                 return this;
             }
 
+            /**
+             * Builds and returns a new Generator instance.
+             * @returns {Generator} The constructed generator
+             */
             build() {
                 return new Generator(this);
             }
@@ -216,10 +246,19 @@ class Generator extends Item {
         return Builder;
     }
 
+	/**
+     * Compares two objects for deep equality via JSON serialization.
+     * @param {*} a - First object
+     * @param {*} b - Second object
+     * @returns {boolean} true if both objects have identical JSON representations
+     */
 	equals(a,b) {
 		return JSON.stringify(a) === JSON.stringify(b);
 	}
 	
+	/**
+     * Upgrades this generator by one level, if not at maximum level.
+     */
 	upgrade() {
 		if (this.itemLevel < this.maxItemLevel) {
             this.itemLevel++;
@@ -227,7 +266,7 @@ class Generator extends Item {
 	}
 
     /**
-     * Downgrades this generator by one level
+     * Downgrades this generator by one level.
      */
     downgrade() {
         if (this.itemLevel > 0) {
@@ -236,10 +275,10 @@ class Generator extends Item {
     }
 
     /**
-     * Retrieves the amount this generator currently is generating per
-     * processing cycle
-     *
-     * @return Amount of resources generated by this generator
+     * Retrieves the amount this generator produces per processing cycle.
+     * Formula: baseAmount * (amountMultiplier ^ (level - 1)), with optional remainder carry-over.
+     * In BigInt mode, uses scaled integer arithmetic for fractional multipliers.
+     * @returns {number|bigint} Generated amount (bigint if BigInt mode is enabled)
      */
     getGeneratedAmount() {
         if (this.itemLevel == 0) return 0;
@@ -305,6 +344,12 @@ class Generator extends Item {
         return parseInt(tmp);
     }
 
+    /**
+     * Applies all attached modifiers to a value.
+     * Each modifier's multiplier is applied multiplicatively.
+     * @param {number|bigint} val - Value to modify
+     * @returns {number|bigint} Modified value
+     */
     processModifiers(val) {
         if (this.modifiers.length == 0) return val;
 
@@ -326,10 +371,8 @@ class Generator extends Item {
     }
 
     /**
-     * Determines if this generator should generate anything based on its
-     * properties such as item level and probability.
-     *
-     * @return True if should work, false otherwise
+     * Determines if this generator should produce resources based on its level and probability.
+     * @returns {boolean} true if the generator should work this cycle
      */
     isWorking() {
         if (this.itemLevel > 0) {
@@ -340,32 +383,37 @@ class Generator extends Item {
     }
 
     /**
-     * Processes this generator, generating resources as per the rules
-     * of this generator.
+     * Processes this generator, adding produced resources to its currency.
      */
     process() {
         if (this.isWorking()) {
             this.currency.add(this.getGeneratedAmount());
             this.timesProcessed++;
-            //if (callback != null) callback.onProcessed();
         }
     }
 
     /**
-     * Retrieves the number of times this generator has done its processing
-     *
-     * @return Number of times processed
+     * Retrieves the number of times this generator has been processed.
+     * @returns {number} Times processed count
      */
     getTimesProcessed() {
         return this.timesProcessed;
     }
 
+    /**
+     * Attaches a modifier to this generator.
+     * @param {Modifier} modifier - Modifier to attach
+     */
     attachModifier(modifier) {
         if (modifier && !this.modifiers.contains(modifier)) {
             this.modifiers.push(modifier);
         }
     }
 
+    /**
+     * Detaches a modifier from this generator.
+     * @param {Modifier} modifier - Modifier to detach
+     */
     detachModifier(modifier) {
         if (modifier) {
             var idx = this.modifiers.indexOf(modifier);
