@@ -7,131 +7,292 @@ const PurchaseResult = {
 var PurchaseResult_1 = PurchaseResult;
 
 /**
- * Base class for all the purchasable "items".
- * 
+ * Utility module for BigInt arithmetic operations.
+ * Provides safe conversions and mathematical operations that work with JavaScript's native BigInt type.
+ *
+ * @module bigint-utils
+ */
+const BigIntUtils = {
+    /**
+     * Converts a number or string to BigInt.
+     * @param {number|string|bigint} val - Value to convert
+     * @returns {bigint} The converted BigInt value
+     * @throws {Error} If the input is a non-integer number or an unsupported type
+     */
+    from(val) {
+        if (typeof val === 'bigint') return val;
+        if (typeof val === 'number') {
+            if (!Number.isInteger(val)) {
+                throw new Error('Cannot convert non-integer number to BigInt');
+            }
+            return BigInt(val);
+        }
+        if (typeof val === 'string') {
+            return BigInt(val);
+        }
+        throw new Error(`Cannot convert ${typeof val} to BigInt`);
+    },
+
+    /**
+     * Converts a BigInt back to a regular number.
+     * @param {bigint|*} bi - BigInt value to convert
+     * @returns {number|*} The converted number, or original value if not BigInt
+     */
+    toNumber(bi) {
+        if (typeof bi !== 'bigint') return bi;
+        return Number(bi);
+    },
+
+    /**
+     * Adds two values, converting them to BigInt if needed.
+     * @param {number|string|bigint} a - First operand
+     * @param {number|string|bigint} b - Second operand
+     * @returns {bigint} Sum of a and b
+     */
+    add(a, b) {
+        return this.from(a) + this.from(b);
+    },
+
+    /**
+     * Subtracts b from a, using BigInt arithmetic.
+     * @param {number|string|bigint} a - Minuend
+     * @param {number|string|bigint} b - Subtrahend
+     * @returns {bigint} Difference of a and b
+     */
+    sub(a, b) {
+        return this.from(a) - this.from(b);
+    },
+
+    /**
+     * Multiplies two values, using BigInt arithmetic.
+     * @param {number|string|bigint} a - First factor
+     * @param {number|string|bigint} b - Second factor
+     * @returns {bigint} Product of a and b
+     */
+    mul(a, b) {
+        return this.from(a) * this.from(b);
+    },
+
+    /**
+     * Divides a by b using integer division, using BigInt arithmetic.
+     * @param {number|string|bigint} a - Dividend
+     * @param {number|string|bigint} b - Divisor
+     * @returns {bigint} Quotient of a divided by b (truncated toward zero)
+     */
+    div(a, b) {
+        return this.from(a) / this.from(b);
+    },
+
+    /**
+     * Computes the remainder of a divided by b, using BigInt arithmetic.
+     * @param {number|string|bigint} a - Dividend
+     * @param {number|string|bigint} b - Divisor
+     * @returns {bigint} Remainder of a divided by b
+     */
+    mod(a, b) {
+        return this.from(a) % this.from(b);
+    },
+
+    /**
+     * Raises base to the power of exp using integer exponentiation.
+     * Only supports non-negative integer exponents.
+     * @param {number|string|bigint} base - The base value
+     * @param {number|string|bigint} exp - The exponent (must be non-negative integer)
+     * @returns {bigint} base raised to the power of exp
+     * @throws {Error} If the exponent is negative
+     */
+    pow(base, exp) {
+        let result = BigInt(1);
+        let b = this.from(base);
+        let e = this.from(exp);
+
+        if (e < 0n) {
+            throw new Error('BigInt.pow does not support negative exponents');
+        }
+
+        while (e > 0n) {
+            if (e % 2n === 1n) {
+                result = result * b;
+            }
+            b = b * b;
+            e = e / 2n;
+        }
+
+        return result;
+    },
+
+    /**
+     * Checks if a is strictly greater than b.
+     * @param {number|string|bigint} a - First value
+     * @param {number|string|bigint} b - Second value
+     * @returns {boolean} true if a > b
+     */
+    gt(a, b) {
+        return this.from(a) > this.from(b);
+    },
+
+    /**
+     * Checks if a is greater than or equal to b.
+     * @param {number|string|bigint} a - First value
+     * @param {number|string|bigint} b - Second value
+     * @returns {boolean} true if a >= b
+     */
+    gte(a, b) {
+        return this.from(a) >= this.from(b);
+    },
+
+    /**
+     * Checks if a is strictly less than b.
+     * @param {number|string|bigint} a - First value
+     * @param {number|string|bigint} b - Second value
+     * @returns {boolean} true if a < b
+     */
+    lt(a, b) {
+        return this.from(a) < this.from(b);
+    },
+
+    /**
+     * Checks if a is less than or equal to b.
+     * @param {number|string|bigint} a - First value
+     * @param {number|string|bigint} b - Second value
+     * @returns {boolean} true if a <= b
+     */
+    lte(a, b) {
+        return this.from(a) <= this.from(b);
+    },
+
+    /**
+     * Checks if a is strictly equal to b.
+     * @param {number|string|bigint} a - First value
+     * @param {number|string|bigint} b - Second value
+     * @returns {boolean} true if a === b
+     */
+    eq(a, b) {
+        return this.from(a) === this.from(b);
+    },
+
+    /**
+     * Checks whether a value is a BigInt.
+     * @param {*} val - Value to check
+     * @returns {boolean} true if val is a BigInt
+     */
+    isBig(val) {
+        return typeof val === 'bigint';
+    }
+};
+
+var bigintUtils = BigIntUtils;
+
+/**
+ * Base class for all purchasable items.
+ * Items have a level, price, and can be upgraded/downgraded.
+ * Supports optional BigInt arithmetic via the basePrice property.
+ *
  * @author Harri Pellikka
+ * @class
  */
 class Item {
     /**
-     * Constructs a new item
-     * @param world World this item belongs to
+     * Constructs a new item.
+     * @param {World} world - World this item belongs to
+     * @param {string} [name="Nameless Item"] - Name of this item
      */
     constructor (world, name = "Nameless Item") {
         /**
          * World this item belongs to
+         * @type {World}
          */
         this.world = world;
 
         /**
          * Modifiers applied to this item
+         * @type {Array}
          */
         this.modifiers = [];
 
         /**
-         * The base price of the item (i.e. the price of the first level of this item)
+         * The base price of the item (i.e. the price of the first level).
+         * When using BigInt mode, this is stored as a bigint.
+         * @type {number|bigint}
          */
-        this.basePrice = 1;//BigInteger.ONE;
+        this.basePrice = 1;
 
         /**
          * Name of this item
+         * @type {string}
          */
         this.name = name;
 
         /**
          * Description text for this item
+         * @type {string}
          */
         this.description = "No description.";
 
         /**
          * Current level of this item
+         * @type {number}
          */
         this.itemLevel = 0;
 
         /**
-         * Max. item level
+         * Maximum item level
+         * @type {number}
          */
-        this.maxItemLevel = 99999999;//Long.MAX_VALUE;
+        this.maxItemLevel = 99999999;
 
         /**
-         * Price multiplier per level. This is used in the price formula
-         * like this: price = (base price) * (price multiplier) ^ (item level)
+         * Price multiplier per level. Used in the formula:
+         * price = basePrice * (priceMultiplier ^ itemLevel)
+         * @type {number}
          */
         this.priceMultiplier = 1.145;
     }
 
     /**
-     * Retrieves the name of this item
-     *
-     * @return {string} Name of this item
+     * Retrieves the name of this item.
+     * @returns {string} Name of this item
      */
     getName() {
         return this.name;
     }
 
     /**
-     * Sets the name of this item
-     *
-     * @param name New name for this item
+     * Sets the name of this item.
+     * @param {string} name - New name for this item
      */
     setName(name) {
-        //if (name == null || name.length() == 0)
-            //throw new RuntimeException("Item name cannot be null or empty");
         this.name = name;
     }
 
     /**
-     * This method logs the given message to the browser console.
-     *
-     * @public
-     * @method
+     * Retrieves the description of this item.
+     * @returns {string} Description text
      */
     getDescription() {
         return this.description;
     }
 
+    /**
+     * Sets the description of this item.
+     * @param {string} description - New description text
+     */
     setDescription(description) {
         this.description = description;
     }
 
     /**
-     * Retrieves the base price of this item
-     *
-     * @return Base price of this item
+     * Retrieves the base price of this item.
+     * @returns {number|bigint} Base price (number or bigint depending on configuration)
      */
     getBasePrice() {
         return this.basePrice;
     }
 
-    setBasePrice(basePrice) {
-        this.basePrice = basePrice;
-    }
-
-    getPrice() {
-        var tmp = this.basePrice;
-        tmp = tmp * Math.pow(this.priceMultiplier, this.itemLevel);
-        return tmp;
-    }
-
-    buyWith(currency) {
-        //if (currency == null) throw new IllegalArgumentException("Currency cannot be null");
-        if (this.itemLevel >= this.maxItemLevel)
-            return PurchaseResult_1.MAX_LEVEL_REACHED;
-
-        var price = this.getPrice();
-        var result = currency.value - price;
-		
-        if (result < 0) {
-            return PurchaseResult_1.INSUFFICIENT_FUNDS;
-        }
-        currency -= price;//currency.sub(price);
-        this.upgrade();
-        return PurchaseResult_1.OK;
-    }
-
     /**
-     * Sets the base price of this item
-     *
-     * @param basePrice New base price for this item
+     * Sets the base price of this item.
+     * @param {number} basePrice - New base price (must not be null or zero)
+     * @throws {string} If basePrice is null or zero
      */
     setBasePrice(basePrice) {
         if (basePrice == null) throw "Base price cannot be null";
@@ -141,59 +302,128 @@ class Item {
         this.basePrice = basePrice;
     }
 
-    setBasePrice(basePrice) {
-        this.basePrice = basePrice;//new BigInteger("" + basePrice);
-    }
-
     /**
-     * Retrieves the price multiplier
-     *
-     * @return Price multiplier
+     * Retrieves the price multiplier.
+     * @returns {number} Price multiplier
      */
     getPriceMultiplier() {
         return this.priceMultiplier;
     }
 
     /**
-     * Sets the price multiplier of this item
-     *
-     * @param multiplier Price multiplier
+     * Sets the price multiplier of this item.
+     * @param {number} multiplier - Price multiplier value
      */
     setPriceMultiplier(multiplier) {
         this.priceMultiplier = multiplier;
     }
 
+    /**
+     * Retrieves the maximum item level.
+     * @returns {number} Maximum item level
+     */
     getMaxItemLevel() {
         return this.maxItemLevel;
     }
 
+    /**
+     * Sets the maximum item level.
+     * @param {number} maxLvl - Maximum level (must be positive)
+     * @throws {string} If maxLvl is zero or negative
+     */
     setMaxItemLevel(maxLvl) {
         if (maxLvl <= 0) throw "Max item level cannot be zero or negative";
         this.maxItemLevel = maxLvl;
     }
 
+    /**
+     * Retrieves the current item level.
+     * @returns {number} Current item level
+     */
     getItemLevel() {
         return this.itemLevel;
     }
 
+    /**
+     * Sets the item level, clamping between 0 and maxItemLevel.
+     * @param {number} lvl - Desired level
+     */
     setItemLevel(lvl) {
         this.itemLevel = lvl < 0 ? 0 : lvl > this.maxItemLevel ? this.maxItemLevel : lvl;
     }
 
+    /**
+     * Upgrades this item by one level, if not at maximum level.
+     */
     upgrade() {
         if (this.itemLevel < this.maxItemLevel) {
             this.itemLevel++;
         }
     }
 
+    /**
+     * Downgrades this item by one level, if above level 0.
+     */
     downgrade() {
         if (this.itemLevel > 0) {
             this.itemLevel--;
         }
     }
 
+    /**
+     * Sets this item's level to its maximum.
+     */
     maximize() {
         this.itemLevel = this.maxItemLevel;
+    }
+
+    /**
+     * Calculates the current price of this item based on its level.
+     * Formula: price = basePrice * (priceMultiplier ^ itemLevel)
+     * @returns {number|bigint} Current price (bigint if basePrice is bigint)
+     */
+    getPrice() {
+        var tmp;
+        if (typeof this.basePrice === 'bigint') {
+            var priceMultiplierFloat = Number(this.basePrice) * Math.pow(this.priceMultiplier, this.itemLevel);
+            return BigInt(Math.floor(priceMultiplierFloat));
+        }
+        tmp = this.basePrice;
+        tmp = tmp * Math.pow(this.priceMultiplier, this.itemLevel);
+        return tmp;
+    }
+
+    /**
+     * Attempts to purchase this item using the given currency.
+     * If successful, upgrades the item and deducts the price from the currency.
+     * @param {Currency} currency - Currency to pay with
+     * @returns {string} PurchaseResult indicating outcome (OK, INSUFFICIENT_FUNDS, MAX_LEVEL_REACHED)
+     */
+    buyWith(currency) {
+        if (this.itemLevel >= this.maxItemLevel)
+            return PurchaseResult_1.MAX_LEVEL_REACHED;
+
+        var price = this.getPrice();
+        var result;
+        
+        if (typeof currency.value === 'bigint') {
+            result = currency.value - bigintUtils.from(price);
+        } else {
+            result = currency.value - price;
+        }
+		
+        if (result < 0) {
+            return PurchaseResult_1.INSUFFICIENT_FUNDS;
+        }
+        
+        if (typeof currency.value === 'bigint') {
+            currency.value = currency.value - bigintUtils.from(price);
+        } else {
+            currency.value -= price;
+        }
+        
+        this.upgrade();
+        return PurchaseResult_1.OK;
     }
 }
 
@@ -201,30 +431,40 @@ var item = Item;
 
 /**
  * Automator class for automating generators.
- * 
- * Normally generators are manually controlled, i.e. they generate resources
- * when explicitly told to. Automators are used to trigger generators
- * during the world's update cycles.
- * 
+ * Normally generators are manually controlled (they generate resources only when explicitly told to).
+ * Automators trigger generators during world update cycles based on a tick rate.
+ *
+ * @author Harri Pellikka
+ * @extends Item
  * @public
  * @class
- * @author Harri Pellikka
  */
 class Automator extends item
 {
 	/**
-     * Constructs a new item
-     * @param world World this item belongs to
+     * Constructs a new automator.
+     * @param {World} world - World this automator belongs to
+     * @param {string} name - Name of this automator
      */
     constructor(world, name){
         super(world, name);
+        /**
+         * Whether this automator uses BigInt arithmetic.
+         * @type {boolean}
+         * @private
+         */
+        this._useBigInt = false;
     }
 
+    /**
+     * Builder class for creating new automators.
+     * @class
+     */
     static get Builder() {
         class Builder {
             /**
-             * Constructs a new automator builder
-             * @param world World the automator belongs to
+             * Constructs a new automator builder.
+             * @param {World} world - The world the automator belongs to
              */
             constructor(world){
                 this.mWorld = world;
@@ -233,23 +473,40 @@ class Automator extends item
                 this.mTickTimer = 0.0;
                 this.mName = "Nameless automator";
                 this.mEnabled = true;
-                this.mBasePrice = 999999999;//BigInteger.ONE;
+                this.mBasePrice = 999999999;
                 this.mPriceMultiplier = 1.1;
                 this.mTickRateMultiplier = 1.08;
+                this._useBigInt = false;
             }
 
-            basePrice(name) {
-                this.basePrice = name;
+            /**
+             * Sets the base price of this automator.
+             * @param {number} price - Base price
+             * @returns {Builder} This builder for chaining
+             */
+            basePrice(price) {
+                this.mBasePrice = price;
                 
                 return this;
             }
             
+            /**
+             * Sets the price multiplier per level.
+             * @param {number} multiplier - Price multiplier
+             * @returns {Builder} This builder for chaining
+             */
             priceMultiplier(multiplier) {
                 this._priceMultiplier = multiplier;
 
                 return this;
             }
             
+            /**
+             * Sets the tick rate multiplier per level.
+             * Higher levels reduce the actual tick rate (faster automation).
+             * @param {number} multiplier - Tick rate multiplier
+             * @returns {Builder} This builder for chaining
+             */
             tickRateMultiplier(multiplier) {
                 this._tickRateMultiplier  = multiplier;
 
@@ -258,57 +515,62 @@ class Automator extends item
             
             /**
              * Sets the target generator this automator should automate.
-             * 
-             * @param generator Generator to automate
-             * @return This builder for chaining
+             * @param {Generator} generator - Generator to automate
+             * @returns {Builder} This builder for chaining
              */
             automate(generator) {
-                this.generator  = generator;
+                this.mGenerator = generator;
 
                 return this;
             }
 
             /**
              * Sets the name for this automator.
-             * 
-             * @param name Name
-             * @return This builder for chaining
+             * @param {string} name - Automator name
+             * @returns {Builder} This builder for chaining
              */
             name(name) {
-                this.name = name;
+                this.mName = name;
 
                 return this;
             }
              
             /**
-             * Sets the tick rate of this automator, i.e. how often
-             * this automator should do its business.
-             * 
-             * @param seconds Tick rate in seconds
-             * @return This builder for chaining
+             * Sets the tick rate of this automator (how often it triggers the generator).
+             * @param {number} seconds - Tick rate in seconds
+             * @returns {Builder} This builder for chaining
              */
             every(seconds) {
-                this.tickRate = seconds;
+                this.mTickRate = seconds;
 
                 return this;
             }
             
             /**
-             * Constructs the automator based on the given properties.
-             * @return The automator
+             * Enables BigInt mode for this automator.
+             * When enabled, internal state uses JavaScript BigInt for precision with large values.
+             * @returns {Builder} This builder for chaining
+             */
+            useBigInt() {
+                this._useBigInt = true;
+                return this;
+            }
+            
+            /**
+             * Builds and returns a new Automator instance.
+             * @returns {Automator} The constructed automator
              */
             build() {
-                //if (generator == null) throw new IllegalStateException("Generator cannot be null");
-                var a = new Automator(this.mWorld, this.name);
-                a.generator = this.generator;
+                var a = new Automator(this.mWorld, this.mName);
+                a.generator = this.mGenerator;
                 a.enabled = this.mEnabled;
-                a.basePrice = this.basePrice;
+                a.basePrice = this.mBasePrice;
                 a._priceMultiplier = this._priceMultiplier;
-                //console.log('mult '+ this._tickRateMultiplier)
                 a.multiplier = this._tickRateMultiplier;
-                a.tickRate = this.tickRate;
+                a.tickRate = this.mTickRate;
                 a.tickTimer = this.mTickTimer;
-                a.actualTickRate = this.actualTickRate;
+                a.actualTickRate = this.mTickRate;
+                a._useBigInt = this._useBigInt;
                 
                 this.mWorld.addAutomator(a);
                 
@@ -320,8 +582,7 @@ class Automator extends item
     }
 
     /**
-     * Enables this automator. Automators are enabled by default when
-     * they are created.
+     * Enables this automator. Automators are enabled by default when created.
      */
     enable() {
         if (!this.enabled) {
@@ -331,7 +592,7 @@ class Automator extends item
     }
 
     /**
-     * Disables this automator, effectively turning the automation off.
+     * Disables this automator, effectively turning off automation.
      */
     disable() {
         if (this.enabled) {
@@ -340,12 +601,19 @@ class Automator extends item
         }
     }
 
-	//this.super_upgrade = this.upgrade;
+    /**
+     * Upgrades this automator and recalculates its effective tick rate.
+     */
     upgrade() {
-        super.upgrade(); //To change body of generated methods, choose Tools | Templates.
+        super.upgrade();
         this.actualTickRate = this.getFinalTickRate();
     }
 
+    /**
+     * Calculates the final tick rate after applying level-based speedup.
+     * Formula: tickRate / (multiplier ^ (level - 1))
+     * @returns {number} Final tick rate in seconds
+     */
     getFinalTickRate() {
         if (this.itemLevel == 0) return 0.0;
         var r = this.tickRate;
@@ -354,6 +622,11 @@ class Automator extends item
         return r / m;
     }
 
+    /**
+     * Updates this automator's tick timer and triggers the generator when ready.
+     * Called by World.update() each frame/tick.
+     * @param {number} delta - Time elapsed since last update (in seconds)
+     */
     update(delta){
         if (!this.enabled || this.itemLevel == 0) return;
 
@@ -365,8 +638,8 @@ class Automator extends item
     }
 
     /**
-     * Retrieves the tick rate of this automator.
-     * @return Tick rate in seconds
+     * Retrieves the configured tick rate of this automator.
+     * @returns {number} Tick rate in seconds
      */
     getTickRate() {
         return this.tickRate;
@@ -374,8 +647,7 @@ class Automator extends item
 
     /**
      * Sets the tick rate of this automator.
-     * 
-     * @param tickRate Tick rate in seconds
+     * @param {number} tickRate - Tick rate in seconds (must be non-negative)
      */
     setTickRate(tickRate) {
         this.tickRate = tickRate;
@@ -383,10 +655,9 @@ class Automator extends item
     }
 
     /**
-     * Retrieves the percentage of the tick. Useful
-     * when creating progress bars for generators.
-     * 
-     * @return Percentage of tick completion
+     * Retrieves the percentage of tick completion.
+     * Useful for progress bars in UI.
+     * @returns {number} Percentage of tick completion (0.0 to 1.0)
      */
     getTimerPercentage() {
         return this.tickRate != 0.0 ? this.tickTimer / this.tickRate : 1.0;
@@ -397,29 +668,75 @@ var automator = Automator;
 
 /**
  * Base class for all currencies.
+ * Stores the current value which can be either a number or BigInt depending on configuration.
  *
  * @author Harri Pellikka
+ * @class
  */
 class Currency
 {
+    /**
+     * Constructs a new currency from a builder.
+     * @param {Object} build - The builder object containing configuration
+     * @param {string} build.mName - Name of the currency
+     * @param {World} build.world - The world this currency belongs to
+     * @param {boolean} build._useBigInt - Whether to use BigInt for value storage
+     */
     constructor (build){
         this.name = build.mName;
         this.world = build.world;
-        this.value = 0;
+        this._useBigInt = build._useBigInt || false;
+        
+        if (this._useBigInt) {
+            /** @type {bigint} */
+            this.value = BigInt(0);
+        } else {
+            /** @type {number} */
+            this.value = 0;
+        }
     }
 
+    /**
+     * Builder class for creating new currencies.
+     * @class
+     */
     static get Builder() {
         class Builder {
+            /**
+             * Constructs a new currency builder.
+             * @param {World} world - The world the currency belongs to
+             */
             constructor(world) {
                 this.mName = "Gold";
                 this.world = world;
+                this._useBigInt = false;
             }
 
+            /**
+             * Sets the name for this currency.
+             * @param {string} name - Currency name
+             * @returns {Builder} This builder for chaining
+             */
             name(name) {
                 this.mName = name;
                 return this;
             }
 
+            /**
+             * Enables BigInt mode for this currency.
+             * When enabled, the currency value is stored as JavaScript BigInt,
+             * allowing exact arithmetic for values beyond Number.MAX_SAFE_INTEGER (~9×10^15).
+             * @returns {Builder} This builder for chaining
+             */
+            useBigInt() {
+                this._useBigInt = true;
+                return this;
+            }
+
+            /**
+             * Builds and returns a new Currency instance.
+             * @returns {Currency} The constructed currency
+             */
             build() {
                 return new Currency(this);
             }
@@ -428,26 +745,69 @@ class Currency
         return Builder;
     }
 	
+    /**
+     * Returns the currency value as a string representation.
+     * Useful for display purposes since BigInt cannot be directly interpolated in strings.
+     * @returns {string} String representation of the currency value
+     */
     getAmountAsString() {
         return this.value.toString();
     }
 
+    /**
+     * Adds an amount to the currency value.
+     * @param {number|string|bigint} amount - Amount to add
+     */
     add(amount) {
-        this.value = this.value + amount;
+        if (this._useBigInt) {
+            this.value = bigintUtils.add(this.value, amount);
+        } else {
+            this.value = this.value + amount;
+        }
     }
 
+    /**
+     * Subtracts an amount from the currency value.
+     * @param {number|string|bigint} amount - Amount to subtract
+     */
     sub(amount) {
-        this.value = this.value - amount;
+        if (this._useBigInt) {
+            this.value = bigintUtils.sub(this.value, amount);
+        } else {
+            this.value = this.value - amount;
+        }
     }
 
+    /**
+     * Multiplies the currency value by a multiplier.
+     * @param {number|string|bigint} multiplier - Multiplier value
+     */
     multiply(multiplier) {
-        this.value = this.value * multiplier;
+        if (this._useBigInt) {
+            this.value = bigintUtils.mul(this.value, multiplier);
+        } else {
+            this.value = this.value * multiplier;
+        }
     }
 
+    /**
+     * Sets the currency value to a new value.
+     * @param {number|string|bigint} newValue - New value to set
+     */
     set(newValue) {
-        this.value = newValue;
+        if (this._useBigInt) {
+            this.value = bigintUtils.from(newValue);
+        } else {
+            this.value = newValue;
+        }
     }
 
+	/**
+     * Compares two objects for deep equality via JSON serialization.
+     * @param {*} a - First object
+     * @param {*} b - Second object
+     * @returns {boolean} true if both objects have identical JSON representations
+     */
 	equals(a,b) {
 		return JSON.stringify(a) === JSON.stringify(b);
 	}
@@ -720,33 +1080,87 @@ class World {
 var world = World;
 
 /**
- * A base class for all the generators.
- * <p>
- * Generators are used to produce resources (e.g. currencies), and
- * can be controlled either manually or automatically by using
- * an Automator.
+ * A base class for all generators.
+ * Generators produce resources (currencies) and can be controlled
+ * manually or automatically via Automators.
+ * Supports optional BigInt arithmetic for high-precision production at high levels.
+ *
+ * @author Harri Pellikka
+ * @extends Item
+ * @class
  */
 class Generator extends item {
+    /**
+     * Constructs a new generator from a builder.
+     * @param {Object} build - The builder object containing configuration
+     */
     constructor(build){
         super(build.mWorld, build.mName);
 
+        this._useBigInt = build._useBigInt || false;
         this.maxItemLevel = build.mMaxLevel;
         this.amountMultiplier = build.mAmountMultiplier;
         this.useRemainder = build.mUseRemainder;
         this.timesProcessed = build.mTimesProcessed;
         this.currency = build.mCurrency;
-        this.baseAmount = build.mBaseAmount;
         
+        if (build.basePrice != null) {
+            if (this._useBigInt) {
+                this.basePrice = bigintUtils.from(build.basePrice);
+            } else {
+                this.basePrice = build.basePrice;
+            }
+        }
+        
+        if (build.priceMultiplier != null) {
+            this.priceMultiplier = build.priceMultiplier;
+        }
 
-        this.remainder = 0;
+        if (this._useBigInt) {
+            /**
+             * Base amount of resources generated per cycle at level 1.
+             * Stored as bigint when BigInt mode is enabled.
+             * @type {bigint}
+             */
+            this.baseAmount = bigintUtils.from(build.mBaseAmount);
+            /**
+             * Accumulated fractional remainder for overflow-based generation.
+             * Only used when useRemainder is true and BigInt mode is enabled.
+             * @type {bigint}
+             */
+            this.remainder = BigInt(0);
+            /**
+             * Floating-point helper for tracking fractional remainders in BigInt mode.
+             * @type {number}
+             */
+            this._remainderFloat = 0;
+        } else {
+            /**
+             * Base amount of resources generated per cycle at level 1.
+             * @type {number}
+             */
+            this.baseAmount = build.mBaseAmount;
+            /**
+             * Accumulated fractional remainder for overflow-based generation.
+             * @type {number}
+             */
+            this.remainder = 0;
+            this._remainderFloat = 0;
+        }
+
         this.modifiers = [];
     }
 
     /**
-     * Builder class for creating new generators
+     * Builder class for creating new generators.
+     * @class
      */
 	static get Builder() {
         class Builder {
+            /**
+             * Constructs a new generator builder.
+             * @param {World} world - The world the generator belongs to
+             */
             constructor(world) {
                 this.mWorld = world;
                 this.mName = "Nameless generator";
@@ -755,65 +1169,61 @@ class Generator extends item {
                 this.mBaseAmount = 1;
                 this.mAmountMultiplier = 1.1;
                 this.mMaxLevel = 999999999;
-                this.mBasePrice = 999999999;//BigInteger.ONE;
+                this.mBasePrice = 999999999;
                 this.mPriceMultiplier = 1.1;
                 this.mProbability = 1.0;
                 this.mProbabilitySet = false;
                 this.mUseRemainder = true;
                 this.mCooldown = 0.0;
                 this.mTimesProcessed = 0;
+                this._useBigInt = false;
             }
+
             /**
              * Sets the cooldown of this generator (in seconds).
-             * This is the minimum time between processing this
-             * generator.
-             *
-             * @param cooldown in seconds
-             * @return This builder for chaining
+             * This is the minimum time between processing this generator.
+             * @param {number} cooldown - Cooldown duration in seconds
+             * @returns {Builder} This builder for chaining
              */
             cooldown(cooldown) {
-                this.cooldown = cooldown;
+                this.mCooldown = cooldown;
                 return this;
             }
 
             /**
-             * Store remainder of resources and generate an extra
-             * when the remainder "overflows"
-             *
-             * @return This builder for chaining
+             * Enables remainder storage: fractional parts of generated amounts
+             * are accumulated and trigger an extra unit when they overflow to 1.0.
+             * @returns {Builder} This builder for chaining
              */
             useRemainder() {
-                this.useRemainder = true;
+                this.mUseRemainder = true;
                 return this;
             }
 
             /**
-             * Discard remainder of resources when generating.
-             *
-             * @return This builder for chaining
+             * Disables remainder storage: fractional parts are discarded each cycle.
+             * @returns {Builder} This builder for chaining
              */
             discardRemainder() {
-                this.useRemainder = false;
+                this.mUseRemainder = false;
                 return this;
             }
 
             /**
-             * Sets the name for the generator
-             *
-             * @param name Name for the generator
-             * @return This builder for chaining
+             * Sets the name for the generator.
+             * @param {string} name - Name for the generator
+             * @returns {Builder} This builder for chaining
              */
             name(name) {
-                this.name = name;
+                this.mName = name;
                 return this;
             }
 
             /**
-             * Sets the multiplier for resource generation. This multiplier
-             * is used in the formula (amount) = (base amount) * (multiplier) ^ (level)
-             *
-             * @param multiplier Amount generation multiplier per level
-             * @return This builder for chaining
+             * Sets the multiplier for resource generation per level.
+             * Formula: amount = baseAmount * (multiplier ^ (level - 1))
+             * @param {number} multiplier - Amount generation multiplier per level
+             * @returns {Builder} This builder for chaining
              */
             multiplier(multiplier) {
                 this.mAmountMultiplier = multiplier;
@@ -821,26 +1231,10 @@ class Generator extends item {
             }
 
             /**
-             * Sets the maximum allowed level for this generator. The max level must
-             * be greated than zero.
-             *
-             * @param maxLevel Maximum allowed level for this generator
-             * @return This builder for chaining
-             */
-            /*this.maxLevel = function(maxLevel) {
-                //if (maxLevel <= 0)
-                //    throw new IllegalArgumentException("Max level must be greater than 0");
-                self.maxLevel = maxLevel;
-                return this;
-            }*/
-
-            /**
-             * Sets the base amount of resources generated by this generator.
-             * This is the amount the generator generates at level 1 and is used
-             * as the base for the higher levels.
-             *
-             * @param amount Base amount of resources generated at level 1
-             * @return This builder for chaining
+             * Sets the base amount of resources generated by this generator at level 1.
+             * @param {number} amount - Base amount of resources
+             * @returns {Builder} This builder for chaining
+             * @throws {string} If amount is null
              */
             baseAmount(amount) {
                 if (amount == null) throw "Base amount cannot be null";
@@ -849,45 +1243,52 @@ class Generator extends item {
             }
 
             /**
-             * Sets the currency that should be generated by the generator.
-             *
-             * @param resource Resource to generate
-             * @return This builder for chaining
-             * @throws IllegalArgumentException Thrown if the currency is null
+             * Sets the currency that this generator produces.
+             * @param {Currency} resource - Currency to generate
+             * @returns {Builder} This builder for chaining
+             * @throws {string} If resource is null
              */
-            generate(resource) { //throws IllegalArgumentException {
+            generate(resource) {
                 if (resource == null) throw "Currency cannot be null";
                 this.mCurrency = resource;
                 return this;
             }
 
             /**
-             * Sets a callback for the generator to be called when the generator
-             * has finished its processing cycle (i.e. has generated something).
-             *
-             * @param callback Callback to call after generating something
-             * @return This builder for chaining
+             * Sets a callback invoked after each processing cycle.
+             * @param {Function} callback - Callback function
+             * @returns {Builder} This builder for chaining
              */
             callback(callback) {
                 this.onProcessed = callback;
                 return this;
             }
 
+            /**
+             * Sets the base price of this generator.
+             * @param {number} price - Base price
+             * @returns {Builder} This builder for chaining
+             */
             price(price) {
                 this.basePrice = price;
                 return this;
             }
 
+            /**
+             * Sets the price multiplier per level.
+             * @param {number} multiplier - Price multiplier
+             * @returns {Builder} This builder for chaining
+             */
             priceMultiplier(multiplier) {
                 this.priceMultiplier = multiplier;
                 return this;
             }
 
             /**
-             * Set a probability for this generator to "work" when it's processed
-             *
-             * @param probability Probability percentage (between 0.0 and 1.0)
-             * @return This builder for chaining
+             * Sets a probability for this generator to work when processed.
+             * @param {number} probability - Probability between 0.0 and 1.0
+             * @returns {Builder} This builder for chaining
+             * @throws {string} If probability is outside [0.0, 1.0]
              */
             probability(probability) {
                 if (probability < 0 || probability > 1.0)
@@ -899,6 +1300,22 @@ class Generator extends item {
                 return this;
             }
 
+            /**
+             * Enables BigInt mode for this generator.
+             * When enabled, baseAmount, remainder, and generated amounts are stored as JavaScript BigInt,
+             * providing exact arithmetic for values beyond Number.MAX_SAFE_INTEGER (~9×10^15).
+             * Uses scaled integer arithmetic internally to handle fractional multipliers (e.g., 1.25).
+             * @returns {Builder} This builder for chaining
+             */
+            useBigInt() {
+                this._useBigInt = true;
+                return this;
+            }
+
+            /**
+             * Builds and returns a new Generator instance.
+             * @returns {Generator} The constructed generator
+             */
             build() {
                 return new Generator(this);
             }
@@ -907,10 +1324,19 @@ class Generator extends item {
         return Builder;
     }
 
+	/**
+     * Compares two objects for deep equality via JSON serialization.
+     * @param {*} a - First object
+     * @param {*} b - Second object
+     * @returns {boolean} true if both objects have identical JSON representations
+     */
 	equals(a,b) {
 		return JSON.stringify(a) === JSON.stringify(b);
 	}
 	
+	/**
+     * Upgrades this generator by one level, if not at maximum level.
+     */
 	upgrade() {
 		if (this.itemLevel < this.maxItemLevel) {
             this.itemLevel++;
@@ -918,7 +1344,7 @@ class Generator extends item {
 	}
 
     /**
-     * Downgrades this generator by one level
+     * Downgrades this generator by one level.
      */
     downgrade() {
         if (this.itemLevel > 0) {
@@ -927,31 +1353,79 @@ class Generator extends item {
     }
 
     /**
-     * Retrieves the amount this generator currently is generating per
-     * processing cycle
-     *
-     * @return Amount of resources generated by this generator
-     * BIG INTEGER
+     * Retrieves the amount this generator produces per processing cycle.
+     * Formula: baseAmount * (amountMultiplier ^ (level - 1)), with optional remainder carry-over.
+     * In BigInt mode, uses scaled integer arithmetic for fractional multipliers.
+     * @returns {number|bigint} Generated amount (bigint if BigInt mode is enabled)
      */
     getGeneratedAmount() {
         if (this.itemLevel == 0) return 0;
 
-        var tmp = this.baseAmount;
-        tmp = tmp * Math.pow(this.amountMultiplier, this.itemLevel - 1);
+        var tmp;
+        
+        if (this._useBigInt) {
+            tmp = this.baseAmount;
+            
+            var mult = this.amountMultiplier;
+            var scale = 1;
+            
+            while (mult !== Math.floor(mult)) {
+                mult *= 10;
+                scale *= 10;
+            }
+            
+            var scaledMult = BigInt(Math.floor(mult));
+            var scaledScale = BigInt(scale);
+            
+            var powResult = bigintUtils.pow(scaledMult, this.itemLevel - 1);
+            var divisor = bigintUtils.pow(scaledScale, this.itemLevel - 1);
+            
+            tmp = bigintUtils.mul(tmp, powResult);
+            tmp = bigintUtils.div(tmp, divisor);
+            
+            if (this.useRemainder) {
+                var floatBase = typeof this.baseAmount === 'bigint' ? Number(this.baseAmount) : this.baseAmount;
+                var floatAmount = floatBase * Math.pow(this.amountMultiplier, this.itemLevel - 1);
+                var tmpRem = floatAmount % 1;
+                this._remainderFloat += tmpRem;
+                if (this._remainderFloat >= 0.999) {
+                    this._remainderFloat -= 1.0;
+                    this.remainder += BigInt(1);
+                }
+            }
+            
+            if (this.remainder > 0n) {
+                tmp = bigintUtils.add(tmp, this.remainder);
+                this.remainder = BigInt(0);
+            }
+        } else {
+            tmp = this.baseAmount;
+            tmp = tmp * Math.pow(this.amountMultiplier, this.itemLevel - 1);
 
-        if (this.useRemainder) {
-            var tmpRem = tmp % 1;
-            this.remainder += tmpRem;
-            if (this.remainder >= 0.999) {
-                this.remainder -= 1.0;
-                tmp = tmp + 1;
+            if (this.useRemainder) {
+                var tmpRem = tmp % 1;
+                this.remainder += tmpRem;
+                if (this.remainder >= 0.999) {
+                    this.remainder -= 1.0;
+                    tmp = tmp + 1;
+                }
             }
         }
+        
         tmp = this.processModifiers(tmp);
 
+        if (this._useBigInt) {
+            return tmp;
+        }
         return parseInt(tmp);
     }
 
+    /**
+     * Applies all attached modifiers to a value.
+     * Each modifier's multiplier is applied multiplicatively.
+     * @param {number|bigint} val - Value to modify
+     * @returns {number|bigint} Modified value
+     */
     processModifiers(val) {
         if (this.modifiers.length == 0) return val;
 
@@ -959,7 +1433,13 @@ class Generator extends item {
             var d = this.modifiers[i].getMultiplier();
 
             if (d != 1.0) {
-                val = val * d;
+                if (this._useBigInt && bigintUtils.isBig(val)) {
+                    var scaledD = d * 1000;
+                    val = bigintUtils.mul(val, BigInt(Math.round(scaledD)));
+                    val = bigintUtils.div(val, BigInt(1000));
+                } else {
+                    val = val * d;
+                }
             }
         }
 
@@ -967,49 +1447,55 @@ class Generator extends item {
     }
 
     /**
-     * Determines if this generator should generate anything based on its
-     * properties such as item level and probability.
-     *
-     * @return True if should work, false otherwise
+     * Determines if this generator should produce resources based on its level and probability.
+     * @returns {boolean} true if the generator should work this cycle
      */
     isWorking() {
         if (this.itemLevel > 0) {
-            if (!this.useProbability || Math.Random() < this.probability) return true;
+            if (!this.useProbability || Math.random() < this.probability) return true;
         }
 		
         return false;
     }
 
     /**
-     * Processes this generator, generating resources as per the rules
-     * of this generator.
+     * Processes this generator, adding produced resources to its currency.
      */
     process() {
         if (this.isWorking()) {
             this.currency.add(this.getGeneratedAmount());
             this.timesProcessed++;
-            //if (callback != null) callback.onProcessed();
         }
     }
 
     /**
-     * Retrieves the number of times this generator has done its processing
-     *
-     * @return Number of times processed
+     * Retrieves the number of times this generator has been processed.
+     * @returns {number} Times processed count
      */
     getTimesProcessed() {
         return this.timesProcessed;
     }
 
+    /**
+     * Attaches a modifier to this generator.
+     * @param {Modifier} modifier - Modifier to attach
+     */
     attachModifier(modifier) {
         if (modifier && !this.modifiers.contains(modifier)) {
             this.modifiers.push(modifier);
         }
     }
 
+    /**
+     * Detaches a modifier from this generator.
+     * @param {Modifier} modifier - Modifier to detach
+     */
     detachModifier(modifier) {
         if (modifier) {
-            this.modifiers.remove(modifier);
+            var idx = this.modifiers.indexOf(modifier);
+            if (idx !== -1) {
+                this.modifiers.splice(idx, 1);
+            }
         }
     }
 }
@@ -1274,7 +1760,7 @@ class GeneratorModifier extends Modifier$1
 }
 
 
-var modifier = { WorldTarget, GeneratorTarget, Modifier: Modifier$1, WorldModifier, GeneratorModifier };
+var modifier = { Modifier: Modifier$1};
 
 const { Modifier } = modifier;
 // TODO: change name to Generator again when solving the name collision on rollup
